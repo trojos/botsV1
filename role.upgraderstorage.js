@@ -40,7 +40,7 @@ var roleUpgraderStorage = {
         if (creep.memory.upgrading && creep.carry.energy == 0) {
             creep.memory.upgrading = false;
         }
-        if (!creep.memory.upgrading && (creep.carry.energy == creep.carryCapacity || creep.carry.energy > 750)) {
+        if (!creep.memory.upgrading && (_.sum(creep.carry) == creep.carryCapacity || creep.carry.energy > 750)) {
             creep.memory.upgrading = true;
         }
 
@@ -59,7 +59,9 @@ var roleUpgraderStorage = {
             // }
         }
         else {
-            var dropped = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 3)
+            var dropped = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 3, {
+                filter: dr => dr.resourceType == RESOURCE_ENERGY
+            })
             if (dropped.length > 0) {
                 if (creep.pickup(dropped[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo2(dropped[0], { reusePath: 50 });

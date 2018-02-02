@@ -105,7 +105,13 @@ function getcarrypush2(creep, home) {
                 }
                 Aufträge.push(Auftrag)
             } else {
-                Auftrag = Memory.rooms[home].Labs.Minerals.Terminal
+                console.log(creep.pos.roomName, creep.name)
+                if (Memory.rooms[home].Labs.Minerals == undefined){  //Wenn kein Terminal wird in Storage geliefert
+                    Auftrag = Memory.rooms[home].energy.Lager
+                } else {
+                    Auftrag = Memory.rooms[home].Labs.Minerals.Terminal
+                }
+                
                 Auftrag.res = carrymineral
                 Auftrag.Art = 'push'
                 Aufträge.push(Auftrag)

@@ -119,7 +119,7 @@ var roleBmstr = {
                                     //console.log(creep.pos.roomName)
                                     if (standon.length > 0) {
                                         //console.log(creep.room + '  ' + creep.name + ' nichts zu tun ' + standon)
-                                        creep.moveTo2(creep.room.controller.pos, { reusePath: 5 }, true)                 // wenn ja, bewegt er sich richtung controller damit platz für miner frei ist
+                                        creep.moveTo2(Game.rooms[creep.memory.home].controller.pos, { reusePath: 5 }, true)                 // wenn ja, bewegt er sich richtung controller damit platz für miner frei ist
                                     }
                                 }
                             }

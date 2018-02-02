@@ -120,17 +120,19 @@ var subroom = {
             }
 
             //Straßen bauen
-            if (Game.time % 200 == 0) {
-                var spots = Game.rooms[subroom].find(FIND_SOURCES)
-                var start
-                if (Game.rooms[room].storage) {
-                    start = Game.rooms[room].storage.pos
-                } else {
-                    start = Game.rooms[room].find(FIND_MY_SPAWNS)[0].pos
+            if (insight) {
+                if (Game.time % 200 == 0) {
+                    var spots = Game.rooms[subroom].find(FIND_SOURCES)
+                    var start
+                    if (Game.rooms[room].storage) {
+                        start = Game.rooms[room].storage.pos
+                    } else {
+                        start = Game.rooms[room].find(FIND_MY_SPAWNS)[0].pos
+                    }
+                    spots.forEach(spot => {
+                        buildroad.run(start, spot.pos, 1)
+                    })
                 }
-                spots.forEach(spot => {
-                    buildroad.run(start, spot.pos, 1)
-                })
             }
 
             //----------creeps------------------

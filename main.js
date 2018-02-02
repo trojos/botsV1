@@ -115,7 +115,7 @@ module.exports.loop = function () {
     }
 
     // REACTIONS ausführen   -- vor Räume damit in RaumInit die Carry Auftrage berücksichtigt und bearbeitet werden können
-    // Rezepte: G, LHO2, KHO2, GHO2, GH2O, XLHO2_XKHO2, XGH2O_XGHO2,ZweixXGH2O
+    // Rezepte: G, LHO2, KHO2, GHO2, GH2O, XLHO2_XKHO2, XGH2O_XGHO2, ZweixXGH2O
     if (1 == 1) {
         var reactionsvor = Game.cpu.getUsed()
         reactions.run('W2S18', 'G')
@@ -205,6 +205,8 @@ module.exports.loop = function () {
     var AllEnergyRooms = []
     var GesamteEnergie = 0
     var Durchschnitt = 0
+    var energymax = 900000
+    var energymin = 100000
     for (const room in Empire) {
         if (Empire[room].Energie == undefined) { } else {
             GesamteEnergie += Empire[room].Energie.store
@@ -216,9 +218,9 @@ module.exports.loop = function () {
     var HaveEnergyrooms = []
     var NeedEnergyrooms = {}
     AllEnergyRooms.forEach(room => {
-        if (Empire[room].Energie.store < Durchschnitt * Empire[room].Energie.min) {
+        if (Empire[room].Energie.store < Durchschnitt * Empire[room].Energie.min && Empire[room].Energie.store < energymax) {
             NeedEnergyrooms[room] = { room: room, store: Empire[room].Energie.store }
-        } else if (Empire[room].Energie.store > Durchschnitt * Empire[room].Energie.max) {
+        } else if (Empire[room].Energie.store > Durchschnitt * Empire[room].Energie.max && Empire[room].Energie.store > energymin) {
             HaveEnergyrooms.push(room)
         }
     });
@@ -814,21 +816,13 @@ module.exports.loop = function () {
             var rcreep
             if (rcreeps.length > 1) {
                 rcreep = _.min(rcreeps, 'ticksToLive')
-                //console.log('min', rcreep)
             } else if (rcreeps.length > 0) {
                 rcreep = rcreeps[0]
-                //console.log('einzel', rcreep)
             }
             if (rcreep) {
                 rspawn.renewCreep(rcreep)
                 //console.log('renewed ', rspawn.name,rcreep.name, rcreep.ticksToLive)
             }
-
-            // rcreepm = _.min(rcreeps, 'ticksToLive')
-            // //console.log(rcreepm)
-            // rcreeps.forEach(rcreep => {
-
-            // })
         })
     }
     console.log('CPU renew:', Game.cpu.getUsed() - renewCPUvor)

@@ -169,9 +169,9 @@ var empireroom = {
                     case (Game.rooms[room].storage.store[RESOURCE_ENERGY] > 300000):
                         var wallBP = buildwall.length / 5; break;
                     case (Game.rooms[room].storage.store[RESOURCE_ENERGY] > 150000):
-                        var wallBP = buildwall.length / 10; break;
-                    case (Game.rooms[room].storage.store[RESOURCE_ENERGY] > 100000):
                         var wallBP = buildwall.length / 15; break;
+                    case (Game.rooms[room].storage.store[RESOURCE_ENERGY] > 100000):
+                        var wallBP = buildwall.length / 20; break;
                     case (Game.rooms[room].storage.store[RESOURCE_ENERGY] > 50000):
                         var wallBP = buildwall.length / 25; break;
                     default:
