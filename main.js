@@ -48,7 +48,7 @@ module.exports.loop = function () {
         Game.notify('Error in Codeausführung')
     }
 
-    //Game.notify('Test') twat
+    //Game.notify('Test') twat 
 
 
     if (Memory.stats == undefined) { Memory.stats = {} }
