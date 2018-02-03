@@ -26,7 +26,7 @@ function cmroomf(room) {
 
 var empireroom = {
     run: function (room, subrooms) {
-
+ 
         var CPUvor = Game.cpu.getUsed()
         //Wenn kein Spawn im Room besteht wird abgebrochen!
         var xspawns = Game.rooms[room].find(FIND_MY_STRUCTURES, {

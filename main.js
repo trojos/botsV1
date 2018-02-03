@@ -48,9 +48,6 @@ module.exports.loop = function () {
         Game.notify('Error in Codeausführung')
     }
 
-    //Game.notify('Test') twat 
-
-
     if (Memory.stats == undefined) { Memory.stats = {} }
     Memory.stats['CPU.maininit'] = Game.cpu.getUsed()
     console.log('Init Main ' + Memory.stats['CPU.maininit'])
@@ -173,6 +170,7 @@ module.exports.loop = function () {
     empireroom.run('W7S15', [
         { targetroom: 'W8S15', todo: 'harvest' },
         { targetroom: 'W6S15', todo: 'keeper' },
+        { targetroom: 'W5S15', todo: 'keeper' },
         { targetroom: 'W7S14', todo: 'attack', type: 1, NahDD: 0, FernDD: 1, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
     ])
     empireroom.run('W8S16', [

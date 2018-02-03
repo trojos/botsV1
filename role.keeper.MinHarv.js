@@ -60,9 +60,15 @@ var roleMinHarv = {
                 var lairatSpawn = targetsource.pos.findInRange(FIND_HOSTILE_STRUCTURES, 5, {
                     filter: { structureType: STRUCTURE_KEEPER_LAIR }
                 })
-                var tts = lairatSpawn[0].ticksToSpawn
-                if (tts < 7 || tts == undefined) {
-                    avoidlair(creep, 5)
+                if (lairatSpawn.length > 0) {
+                    var tts = lairatSpawn[0].ticksToSpawn
+                    if (tts < 7 || tts == undefined) {
+                        avoidlair(creep, 5)
+                        var avoidl = true
+                    } else { var avoidl = false }
+                } else { avoidl = false }
+    
+                if (avoidl) {
                 } else {
                     if (creep.harvest(targetsource) == ERR_NOT_IN_RANGE) {
                         creep.moveTo2(targetsource, { reusePath: 25 }), true;

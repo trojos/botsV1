@@ -74,12 +74,27 @@ var rolecarry = {
                         var lairatSpawn = sources.pos.findInRange(FIND_HOSTILE_STRUCTURES, 5, {
                             filter: { structureType: STRUCTURE_KEEPER_LAIR }
                         })
-                        var tts = lairatSpawn[0].ticksToSpawn
-                        var atsource = false
-                        if (creep.pos.inRangeTo(lairatSpawn[0], 8)) { atsource = true }
-                        if (atsource && (tts < 8 || tts == undefined)) {
-                            avoidlair(creep, 6)
+
+                        // var tts = lairatSpawn[0].ticksToSpawn
+                        // var atsource = false
+                        // if (creep.pos.inRangeTo(lairatSpawn[0], 8)) { atsource = true }
+                        // if (atsource && (tts < 8 || tts == undefined)) {
+                        //     avoidlair(creep, 6)
+                        // } else {
+
+                        if (lairatSpawn.length > 0) {
+                            var tts = lairatSpawn[0].ticksToSpawn
+                            var atsource = false
+                            if (creep.pos.inRangeTo(lairatSpawn[0], 8)) { atsource = true }
+                            if (atsource && (tts < 8 || tts == undefined)) {
+                                avoidlair(creep, 6)
+                                var avoidl = true
+                            } else { var avoidl = false }
+                        } else { avoidl = false }
+
+                        if (avoidl) {
                         } else {
+
                             var container = source.pos.findInRange(FIND_STRUCTURES, 2, {
                                 filter: (s) => s.structureType == STRUCTURE_CONTAINER
                                     && s.store[RESOURCE_ENERGY] > 100

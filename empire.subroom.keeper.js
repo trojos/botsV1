@@ -1,6 +1,21 @@
 var creepspawn = require('creepspawn')
+var buildroad = require('build.roads')
 
 //Costmatrix für Raum
+function iscenter(croom) {
+    if (croom.indexOf('S') != -1) {
+        var EW = croom.substring(1, croom.indexOf('S'))
+        var SN = croom.substring(croom.indexOf('S') + 1)
+    } else {
+        var EW = croom.substring(1, croom.indexOf('N'))
+        var SN = croom.substring(croom.indexOf('N') + 1)
+    }
+    if ((EW / 5) % 2 == 1) { var EWcenter = true } else { var EWcenter = false }
+    if ((SN / 5) % 2 == 1) { var SNcenter = true } else { var SNcenter = false }
+
+    if (EWcenter && SNcenter) { return true; } else { return false; }
+}
+
 function cmroomf(room) {
     var cmroom = new PathFinder.CostMatrix
     if (Game.rooms[room] == undefined) { } else {
@@ -68,9 +83,10 @@ var subroom = {
             var insight = true
         }
 
+        var center = iscenter(subroom)
 
         // Rep und Bauzeugs in Memory schreiben
-        if (insight) { 
+        if (insight) {
             HomeRCL = Game.rooms[room].controller.level
             if (Memory.rooms[subroom] == undefined) { Memory.rooms[subroom] = {} }
             if (Memory.rooms[subroom].Bmstr == undefined) { Memory.rooms[subroom].Bmstr = {} }
@@ -90,7 +106,7 @@ var subroom = {
                     case (bmstrsites2 > 300):
                         bauBP = 2; break;
                 }
-     
+
                 Memory.rooms[subroom].Bmstr.baubodyparts = bauBP
 
                 var repstreets = _.sum(Game.rooms[subroom].find(FIND_STRUCTURES, {
@@ -137,10 +153,10 @@ var subroom = {
                         var lairbyspot = spot.pos.findInRange(FIND_HOSTILE_STRUCTURES, 5, {
                             filter: { structureType: STRUCTURE_KEEPER_LAIR }
                         })
-                        Memory.rooms[subroom].spots[spot.id].lair = lairbyspot[0].id
-                        Memory.rooms[subroom].spots[spot.id].tts = lairbyspot[0].ticksToSpawn
 
                         if (lairbyspot.length > 0 || spot.length > 0) {
+                            Memory.rooms[subroom].spots[spot.id].lair = lairbyspot[0].id
+                            Memory.rooms[subroom].spots[spot.id].tts = lairbyspot[0].ticksToSpawn
                             if (lairbyspot[0] == undefined) { lairbyspot[0] = spot[0] }
                             if (spot == undefined) { spot = lairbyspot[0] }
                             var goals = []
@@ -169,9 +185,10 @@ var subroom = {
                                     return costs;
                                 }
                             })
-                        }
                         var waitpoint = fleepath.path[fleepath.path.length - 1]
-                        Memory.rooms[subroom].spots[spot.id].waitpoint = waitpoint
+                        Memory.rooms[subroom].spots[spot.id].waitpoint = waitpoint    
+                        }
+                        
 
                     })
                     // Begrenzen der Source Ziele wenn RCL 6
@@ -186,6 +203,24 @@ var subroom = {
                         }
                     }
                 }
+            }
+        }
+        //Straßen bauen
+        if (insight) {
+            if (Game.time % 500 == 0) {
+                var spots = Game.rooms[subroom].find(FIND_SOURCES)
+                var minerals = Game.rooms[subroom].find(FIND_MINERALS)
+                spots.push(minerals[0])
+                var start
+                if (Game.rooms[room].storage) {
+                    start = Game.rooms[room].storage.pos
+                } else {
+                    start = Game.rooms[room].find(FIND_MY_SPAWNS)[0].pos
+                }
+                spots.forEach(spot => {
+                    console.log(start, spot.pos)
+                    buildroad.run(start, spot.pos, 0)
+                })
             }
         }
 
@@ -229,11 +264,16 @@ var subroom = {
                     //Berechnung ob kleine oder große Invasion
                     var invtype = 'verysmall'
 
-                    if (inBPheal > 10) { invtype = 'small' }
-                    if (inBPheal >= 20) { invtype = 'big'; DDneed = 2 }
-                    if (inBPheal > 45) { invtype = 'verybig'; DDneed = 3 }
-                    if (inBPheal > 60) { invtype = 'nope'; DDneed = 0 } //keine verteidigung!!
+                    if (center) {
+                        invtype = 'nope'; DDneed = 0
+                    } else {
+                        if (inBPheal > 10) { invtype = 'small' }
+                        if (inBPheal >= 20) { invtype = 'big'; DDneed = 2 }
+                        if (inBPheal > 45) { invtype = 'verybig'; DDneed = 3 }
+                        if (inBPheal > 60) { invtype = 'nope'; DDneed = 0 } //keine verteidigung!!
+                    }
                     Memory.rooms[subroom].keeper.invader.type = invtype
+
 
                     //Je nach Invtype creeps heimschicken
                     var evac = false
@@ -309,7 +349,6 @@ var subroom = {
                 for (var i in spots) {
                     var targetkeeper = Game.getObjectById(spots[i].id).pos.findInRange(FIND_HOSTILE_CREEPS, 4)
                     if (targetkeeper.length > 0) { Memory.rooms[subroom].keeper.targetkeeper = targetkeeper[0].id; break; }
-
                 }
                 //Next Spawn
                 var nextlairs = []
@@ -319,12 +358,14 @@ var subroom = {
                 }
                 var next = _.min(nextlairs, 'tts')
                 Memory.rooms[subroom].keeper.tts = next.tts
-                if (next.pos.findInRange(FIND_SOURCES, 5).length) {
-                    Memory.rooms[subroom].keeper.nextspot = next.pos.findInRange(FIND_SOURCES, 5)[0].id
-                } else {
-                    Memory.rooms[subroom].keeper.nextspot = next.pos.findInRange(FIND_MINERALS, 5)[0].id
+                if (next.pos) {
+                    if (next.pos.findInRange(FIND_SOURCES, 5).length) {
+                        Memory.rooms[subroom].keeper.nextspot = next.pos.findInRange(FIND_SOURCES, 5)[0].id
+                    } else {
+                        Memory.rooms[subroom].keeper.nextspot = next.pos.findInRange(FIND_MINERALS, 5)[0].id
+                    }
+                    Memory.rooms[subroom].keeper.nextlair = next.id
                 }
-                Memory.rooms[subroom].keeper.nextlair = next.id
             }
         }
         if (insight) {
@@ -369,12 +410,12 @@ var subroom = {
             }
         }
 
-        if (maxenergy >= 5600) {
+        if (maxenergy >= 5600 && !center) {
             if (Memory.rooms[subroom] != undefined) {
                 var invasion = Memory.rooms[subroom].keeper.invaders
-                var NahDD = Memory.rooms[subroom].keeper.DDneed 
+                var NahDD = Memory.rooms[subroom].keeper.DDneed
             } else { var invastion = false; var NahDD = 0 }
-                       //Wird aus invasionberechnung übernommen
+            //Wird aus invasionberechnung übernommen
             if (invasion || !insight) { console.log(subroom + '  INVASION') }
             var cmem = { role: 'keeperFernDD', home: room, targetroom: subroom }
             var cbody = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, HEAL, HEAL, MOVE, MOVE, HEAL]
@@ -407,7 +448,7 @@ var subroom = {
         }
 
         //Heiler - Keeper          
-        if (maxenergy < 5600) {
+        if (maxenergy < 5600 && !center) {
             var Heiler = 1
             if (Heiler > 0) {
                 var cmem = { role: 'keeperheal', home: room, targetroom: subroom }
@@ -427,7 +468,7 @@ var subroom = {
             }
 
             //FernDD - Keeper
-            if (!needheal) {
+            if (!needheal && !center) {
                 var FernDD = 2
                 if (FernDD > 0) {
                     var cmem = { role: 'keeperFernDD', home: room, targetroom: subroom }
