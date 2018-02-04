@@ -119,6 +119,8 @@ var subroom = {
 
             //Straßen bauen
             //if (subroom == 'W7S18') {
+
+            if (Memory.rooms[subroom] == undefined) {Memory.rooms[subroom]= {}}
             if (Memory.rooms[subroom].Straßenbau == undefined) { Memory.rooms[subroom].Straßenbau = {} }
             if ((Memory.rooms[subroom].Straßenbau.tick == undefined) || Memory.rooms[subroom].Straßenbau.tick < Game.time - 1499 && Memory.rooms[subroom].Straßenbau.fertig == true) {
                 Memory.rooms[subroom].Straßenbau = {}
@@ -127,24 +129,26 @@ var subroom = {
                 Memory.rooms[subroom].Straßenbau.Schritt = 0
             }
             if (Memory.rooms[subroom].Straßenbau.fertig == false) {
-                var spots = Game.rooms[subroom].find(FIND_SOURCES)
-                //var minerals = Game.rooms[subroom].find(FIND_MINERALS)
-                //spots.push(minerals[0])
-                Memory.rooms[subroom].Straßenbau.Gesamtschritte = spots.length
-                if (Memory.rooms[subroom].Straßenbau.Schritt < Memory.rooms[subroom].Straßenbau.Gesamtschritte) {
-                    if (insight) {
-                        var start
-                        if (Game.rooms[room].storage) {
-                            start = Game.rooms[room].storage.pos
-                        } else {
-                            start = Game.rooms[room].find(FIND_MY_SPAWNS)[0].pos
+                if (insight) {
+                    var spots = Game.rooms[subroom].find(FIND_SOURCES)
+                    //var minerals = Game.rooms[subroom].find(FIND_MINERALS)
+                    //spots.push(minerals[0])
+                    Memory.rooms[subroom].Straßenbau.Gesamtschritte = spots.length
+                    if (Memory.rooms[subroom].Straßenbau.Schritt < Memory.rooms[subroom].Straßenbau.Gesamtschritte) {
+                        if (insight) {
+                            var start
+                            if (Game.rooms[room].storage) {
+                                start = Game.rooms[room].storage.pos
+                            } else {
+                                start = Game.rooms[room].find(FIND_MY_SPAWNS)[0].pos
+                            }
+                            buildroad.run(start, spots[Memory.rooms[subroom].Straßenbau.Schritt].pos, 1)
                         }
-                        buildroad.run(start, spots[Memory.rooms[subroom].Straßenbau.Schritt].pos, 1)
+                    } else {
+                        Memory.rooms[subroom].Straßenbau.fertig = true
                     }
-                } else {
-                    Memory.rooms[subroom].Straßenbau.fertig = true
+                    Memory.rooms[subroom].Straßenbau.Schritt += 1
                 }
-                Memory.rooms[subroom].Straßenbau.Schritt += 1
             }
             //}
 

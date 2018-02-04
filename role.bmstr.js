@@ -214,7 +214,7 @@ var roleBmstr = {
                 })
                 if (dropped.length > 0) {
                     if (creep.pickup(dropped[0]) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo2(dropped[0], { reusePath: 25 });
+                        creep.moveTo2(dropped[0], { reusePath: 25, maxRooms: 1 });
                     }
                 } else {
                     var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -224,12 +224,12 @@ var roleBmstr = {
                     })
                     if (container) {
                         if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo2(container, { reusePath: 25 })
+                            creep.moveTo2(container, { reusePath: 25, maxRooms: 1 })
                         }
                     } else {
                         var source = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
                         if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo2(source, { reusePath: 25 })
+                            creep.moveTo2(source, { reusePath: 25, maxRooms: 1 })
                         }
 
                         //console.log(creep.room + '  ' + creep.name + ' minert  ' + standon)
@@ -246,7 +246,7 @@ var roleBmstr = {
                                 })
                             }
                             if (standon) {
-                                creep.moveTo2(creep.room.controller.pos, { reusePath: 5 })                // wenn ja, bewegt er sich richtung controller damit platz für miner frei ist
+                                creep.moveTo2(creep.room.controller.pos, { reusePath: 5 , maxRooms: 1})                // wenn ja, bewegt er sich richtung controller damit platz für miner frei ist
                             }
                         }
 
@@ -257,11 +257,15 @@ var roleBmstr = {
                 }
                 //}
             }
+            // if (creep.pos.x == 49 || creep.pos.x == 0 || creep.pos.y == 49 || creep.pos.y == 0) {
+            //     creep.move(creep.pos.getDirectionTo(25,25) )
+            // }
         } else {
             // ------ Gehe zu targetrom -------
-            targetpos = new RoomPosition(25, 25, creep.memory.targetroom)
+            var targetpos = new RoomPosition(25, 25, creep.memory.targetroom)
             creep.moveTo(targetpos, { reusePath: 100 })
         }
+
     }
 };
 
