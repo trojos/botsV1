@@ -160,7 +160,7 @@ module.exports.loop = function () {
         { targetroom: 'W3S17', todo: 'harvest' },
         { targetroom: 'W5S17', todo: 'harvest' },
         { targetroom: 'W4S16', todo: 'keeper' },
-        //{ targetroom: 'W6S18', todo: 'claim' },
+        { targetroom: 'W7S19', todo: 'claim' },
     ])
     empireroom.run('W7S17', [
         { targetroom: 'W6S17', todo: 'harvest' },
@@ -170,6 +170,7 @@ module.exports.loop = function () {
     empireroom.run('W3S18', [
         { targetroom: 'W4S18', todo: 'harvest' },
         { targetroom: 'W4S19', todo: 'harvest' },
+        { targetroom: 'W7S19', todo: 'claim' },
     ])
     empireroom.run('W7S15', [
         { targetroom: 'W8S15', todo: 'harvest' },
