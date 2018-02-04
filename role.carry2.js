@@ -227,8 +227,7 @@ var rolecarry2 = {
                 if (creep.pos.isNearTo(zielpos)) {
                     var ziel = Game.getObjectById(Aufträge[0].id)
                     var erfolg = creep.transfer(ziel, Aufträge[0].res)
-                    //console.log(creep.name, erfolg)
-                    if (erfolg == 0 || erfolg == -8|| erfolg == -7) {
+                    if (erfolg == 0 || erfolg == -8|| erfolg == -7 || erfolg == -6) {
                         Aufträge.splice(0, 1)
                     }
                     if (Aufträge.length < 1) {

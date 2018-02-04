@@ -185,10 +185,10 @@ var subroom = {
                                     return costs;
                                 }
                             })
-                        var waitpoint = fleepath.path[fleepath.path.length - 1]
-                        Memory.rooms[subroom].spots[spot.id].waitpoint = waitpoint    
+                            var waitpoint = fleepath.path[fleepath.path.length - 1]
+                            Memory.rooms[subroom].spots[spot.id].waitpoint = waitpoint
                         }
-                        
+
 
                     })
                     // Begrenzen der Source Ziele wenn RCL 6
@@ -205,24 +205,38 @@ var subroom = {
                 }
             }
         }
-        //Straßen bauen
-        if (insight) {
-            if (Game.time % 500 == 0) {
+        //if (subroom == 'W4S16') {
+        if (Memory.rooms[subroom].Straßenbau == undefined) { Memory.rooms[subroom].Straßenbau = {} }
+        if ((Memory.rooms[subroom].Straßenbau.tick == undefined) || Memory.rooms[subroom].Straßenbau.tick < Game.time - 500 && Memory.rooms[subroom].Straßenbau.fertig == true) {
+            Memory.rooms[subroom].Straßenbau = {}
+            Memory.rooms[subroom].Straßenbau.tick = Game.time
+            Memory.rooms[subroom].Straßenbau.fertig = false
+            Memory.rooms[subroom].Straßenbau.Schritt = 0
+        }
+        if (Memory.rooms[subroom].Straßenbau.fertig == false) {
+            if (insight) {
                 var spots = Game.rooms[subroom].find(FIND_SOURCES)
                 var minerals = Game.rooms[subroom].find(FIND_MINERALS)
                 spots.push(minerals[0])
-                var start
-                if (Game.rooms[room].storage) {
-                    start = Game.rooms[room].storage.pos
+                Memory.rooms[subroom].Straßenbau.Gesamtschritte = spots.length
+                if (Memory.rooms[subroom].Straßenbau.Schritt < Memory.rooms[subroom].Straßenbau.Gesamtschritte) {
+                    //Straßen bauen
+                    if (insight) {
+                        var start
+                        if (Game.rooms[room].storage) {
+                            start = Game.rooms[room].storage.pos
+                        } else {
+                            start = Game.rooms[room].find(FIND_MY_SPAWNS)[0].pos
+                        }
+                        buildroad.run(start, spots[Memory.rooms[subroom].Straßenbau.Schritt].pos, 1)
+                    }
                 } else {
-                    start = Game.rooms[room].find(FIND_MY_SPAWNS)[0].pos
+                    Memory.rooms[subroom].Straßenbau.fertig = true
                 }
-                spots.forEach(spot => {
-                    console.log(start, spot.pos)
-                    buildroad.run(start, spot.pos, 0)
-                })
+                Memory.rooms[subroom].Straßenbau.Schritt += 1
             }
         }
+        //}
 
         // Keeper pos und spawnzeiten in Memory schreiben
         if (insight) {

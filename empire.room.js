@@ -26,8 +26,35 @@ function cmroomf(room) {
 
 var empireroom = {
     run: function (room, subrooms) {
- 
+
         var CPUvor = Game.cpu.getUsed()
+        if (Game.rooms[room]) {
+            if (Game.rooms[room].controller) {
+                var HomeRCL = Game.rooms[room].controller.level
+            } else {
+                return;
+            }
+        } else {
+            return;
+        }
+        // Bauen nach gespeicherten Layout
+        if (Game.time % 1500 == 0) {
+            const rcl = 'rcl' + HomeRCL
+            if (HomeRCL) {
+                if (Memory.Layout.shard2[room]) {
+                    if (Memory.Layout.shard2[room][rcl]) {
+                        const layout = Memory.Layout.shard2[room][rcl].buildings
+                        for (const strtype in layout) {
+                            var tobuild = layout[strtype].pos
+                            tobuild.forEach(str => {
+                                Game.rooms[room].createConstructionSite(str.x, str.y, strtype)
+                            })
+                        }
+                    }
+                }
+            }
+        }
+
         //Wenn kein Spawn im Room besteht wird abgebrochen!
         var xspawns = Game.rooms[room].find(FIND_MY_STRUCTURES, {
             filter: struc => struc.structureType == STRUCTURE_SPAWN
@@ -110,7 +137,7 @@ var empireroom = {
                 }
             }
         }
-        HomeRCL = Game.rooms[room].controller.level
+        //HomeRCL = Game.rooms[room].controller.level
         // Rep und Bauzeugs in Memory schreiben
         if (Memory.rooms[room] == undefined) { Memory.rooms[room] = {} }
         if (Memory.rooms[room].Bmstr == undefined) { Memory.rooms[room].Bmstr = {}; Memory.rooms[room].Bmstr.constructionsites = 101 }
@@ -257,7 +284,7 @@ var empireroom = {
             if (subrooms[i].todo == 'claim') { subclaim = subclaim + 1 }
             if (subrooms[i].todo == 'attack') { subattack = subattack + 1 }
         }
-        var HomeRCL = Game.rooms[room].controller.level
+        //var HomeRCL = Game.rooms[room].controller.level
 
         if (Memory.rooms[room].links.center[0]) { var centerli = true; var centerlinkid = Memory.rooms[room].links.center[0] } else { var centerli = false }
         if (Memory.rooms[room].links.upgrade[0]) { var upgradeli = true; var upgradelinkid = Memory.rooms[room].links.upgrade[0] } else { var upgradeli = false }

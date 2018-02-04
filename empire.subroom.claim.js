@@ -37,6 +37,7 @@ var subroomclaim = {
         var needminer = false
         var needcarry = false
         var needbmstr = false
+        var needupgrader = false
         //---------- Scout -----------------
         if (!insight && !claimsuccess) {
             var cmem = { role: 'scout', home: room, targetroom: subroom }
@@ -99,7 +100,7 @@ var subroomclaim = {
             }
         }
         //---------- Upgrader  ---------- bis kleiner RCL 4
-        if (insight && !wait && claimsuccess) {
+        if (insight && !wait && claimsuccess&& !needbmstr) {
             if (Game.rooms[subroom].controller.level < 4) {
                 var spot = Game.rooms[subroom].controller.pos.findClosestByRange(FIND_SOURCES)
                 var cmem = { role: 'upgrader', spot: spot.id, home: room, targetroom: subroom, upgrading: false }
@@ -110,12 +111,13 @@ var subroomclaim = {
                     && creep.memory.targetroom == cmem.targetroom
                     && (creep.ticksToLive > 200 || creep.ticksToLive == undefined));
                 if (ccreep.length < 2) {
+                    needupgrader = true
                     creepspawn.newcreep(room, 'upgrader_' + subroom, creepsize, cbody, cmem)
                 }
             }
         }
         //---------- Deliver  ---------- bis kleiner RCL 5
-        if (insight && !wait && claimsuccess) {
+        if (insight && !wait && claimsuccess && !needbmstr && !needupgrader) {
             if (Game.rooms[subroom].controller.level < 5) {
                 var cmem = { role: 'deliver', home: room, targetroom: subroom }
                 var cbody = [MOVE, CARRY]

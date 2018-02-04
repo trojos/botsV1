@@ -42,6 +42,8 @@ var mineralrezepte = require('mineral.rezepte')
 
 var squadattack = require('squadattack')
 
+//var importlayout = require('build.layouts')
+var exportlayout = require('build.exportlayout')
 
 module.exports.loop = function () {
     if (Game.time > Memory.succesfulltick + 10) {
@@ -53,6 +55,8 @@ module.exports.loop = function () {
     console.log('Init Main ' + Memory.stats['CPU.maininit'])
 
     mineralrezepte.run()
+    //importlayout.run()
+    //exportlayout.run('W6S18')
 
     //Protoype für moveTo2 festlegen
     //Memory.CPUMove2 = 0
@@ -180,6 +184,12 @@ module.exports.loop = function () {
     empireroom.run('W6S18', [
         { targetroom: 'W5S18', todo: 'harvest' },
         { targetroom: 'W7S18', todo: 'harvest' },
+        { targetroom: 'W7S19', todo: 'claim' },
+
+    ])
+    empireroom.run('W7S19', [
+        //{ targetroom: 'W5S18', todo: 'harvest' },
+        //{ targetroom: 'W7S18', todo: 'harvest' },
     ])
 
     // ------------- SQUADATTACK Ausführen von squadattack
