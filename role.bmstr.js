@@ -119,18 +119,23 @@ var roleBmstr = {
                             if (targets.length > 0) {
                                 targets.sort((a, b) => a.hits - b.hits);
                                 var reptarget = Game.getObjectById(targets[0].id)
-                                creep.repair(reptarget)
-                                if (reptarget.hits + (creep.getActiveBodyparts(WORK) * 100) >= reptarget.hitsMax) {
-                                    targets.splice(0, 1)
-                                    if (targets.length > 0) {
-                                        creep.memory.onsitetargets = targets
-                                    } else {
-                                        creep.memory.onsite = false
-                                        delete creep.memory.onsitetarget
-                                    }
+                                if (reptarget == null) {  //  Für den seltenen Fall dass das Ziel während Repvorgang zerstört wird
+                                    creep.memory.onsite = false
+                                    delete creep.memory.onsitetarget
                                 } else {
-                                    targets[0].hits = reptarget.hits
-                                    creep.memory.onsitetargets = targets
+                                    creep.repair(reptarget)
+                                    if (reptarget.hits + (creep.getActiveBodyparts(WORK) * 100) >= reptarget.hitsMax) {
+                                        targets.splice(0, 1)
+                                        if (targets.length > 0) {
+                                            creep.memory.onsitetargets = targets
+                                        } else {
+                                            creep.memory.onsite = false
+                                            delete creep.memory.onsitetarget
+                                        }
+                                    } else {
+                                        targets[0].hits = reptarget.hits
+                                        creep.memory.onsitetargets = targets
+                                    }
                                 }
 
                             } else {
@@ -218,7 +223,7 @@ var roleBmstr = {
                     }
                 } else {
                     var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                        filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 100) ||
+                        filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 550) ||
                             (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 5000) ||
                             (s.structureType == STRUCTURE_TERMINAL && s.store[RESOURCE_ENERGY] > 20000)
                     })
@@ -236,8 +241,9 @@ var roleBmstr = {
                         var miner = creep.pos.findInRange(FIND_MY_CREEPS, 3, {   // Wenn Creep minert und ein miner in der nähe ist wird geprüft ob creep auf container steht
                             filter: cr => cr.memory.role == 'miner'
                         })
+
                         if (miner.length > 0) {
-                            var standon = creep.pos.isNearTo(FIND_STRUCTURES, {
+                            var standon = creep.pos.findInRange(FIND_STRUCTURES, 0, {
                                 filter: stru => stru.structureType == STRUCTURE_CONTAINER
                             })
                             if (!standon) {
@@ -245,8 +251,8 @@ var roleBmstr = {
                                     filter: stru => stru.structureType == STRUCTURE_CONTAINER
                                 })
                             }
-                            if (standon) {
-                                creep.moveTo2(creep.room.controller.pos, { reusePath: 5 , maxRooms: 1})                // wenn ja, bewegt er sich richtung controller damit platz für miner frei ist
+                            if (standon.length > 0) {
+                                creep.moveTo2(creep.room.controller.pos, { reusePath: 5, maxRooms: 1 })                // wenn ja, bewegt er sich richtung controller damit platz für miner frei ist
                             }
                         }
 

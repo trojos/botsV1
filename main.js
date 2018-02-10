@@ -128,6 +128,7 @@ module.exports.loop = function () {
         reactions.run('W1S17', 'ZweixXGH2O')
         reactions.run('W8S16', 'G')
         reactions.run('W6S18', 'G')
+        reactions.run('W7S19', 'G')
         //('reaction CPU: ' + (Game.cpu.getUsed() - reactionsvor))
     }
 
@@ -160,12 +161,13 @@ module.exports.loop = function () {
         { targetroom: 'W3S17', todo: 'harvest' },
         { targetroom: 'W5S17', todo: 'harvest' },
         { targetroom: 'W4S16', todo: 'keeper' },
+        { targetroom: 'W6S19', todo: 'attack', type: 1, NahDD: 0, FernDD: 2, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
         //{ targetroom: 'W7S19', todo: 'claim' },
     ])
     empireroom.run('W7S17', [
         { targetroom: 'W6S17', todo: 'harvest' },
         { targetroom: 'W7S16', todo: 'harvest' },
-        //{ targetroom: 'W6S16', todo: 'keeper' },
+        { targetroom: 'W6S16', todo: 'keeper' },
     ])
     empireroom.run('W3S18', [
         { targetroom: 'W4S18', todo: 'harvest' },
@@ -176,7 +178,8 @@ module.exports.loop = function () {
         { targetroom: 'W8S15', todo: 'harvest' },
         { targetroom: 'W6S15', todo: 'keeper' },
         { targetroom: 'W5S15', todo: 'keeper' },
-        { targetroom: 'W7S14', todo: 'attack', type: 1, NahDD: 0, FernDD: 1, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
+        //{ targetroom: 'W7S14', todo: 'attack', type: 1, NahDD: 0, FernDD: 1, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
+        { targetroom: 'W7S14', todo: 'claim' },
     ])
     empireroom.run('W8S16', [
         { targetroom: 'W9S17', todo: 'harvest' },
@@ -185,12 +188,17 @@ module.exports.loop = function () {
     empireroom.run('W6S18', [
         { targetroom: 'W5S18', todo: 'harvest' },
         { targetroom: 'W7S18', todo: 'harvest' },
-        { targetroom: 'W7S19', todo: 'claim' },
+        { targetroom: 'W5S19', todo: 'harvest' },
+        //{ targetroom: 'W7S19', todo: 'claim' },
         //{ targetroom: 'W6S19', todo: 'bmstr' },
 
     ])
     empireroom.run('W7S19', [
-        { targetroom: 'W6S19', todo: 'harvest' },
+        //{ targetroom: 'W6S19', todo: 'harvest' },
+        //{ targetroom: 'W7S18', todo: 'harvest' },
+    ])
+    empireroom.run('W7S14', [
+        //{ targetroom: 'W6S19', todo: 'harvest' },
         //{ targetroom: 'W7S18', todo: 'harvest' },
     ])
 
@@ -268,7 +276,7 @@ module.exports.loop = function () {
     //Definition Standartmengen  und thresholds
     var MinCPUvor = Game.cpu.getUsed()
     var Ausgangsmaterial = { H: 10000, O: 10000, X: 5000, Z: 5000, K: 5000, U: 5000, L: 5000 }
-    var AMthresholds = { sell: 3, buy: 1, Lagerneed: 1, Lagerhave: 1.5 }
+    var AMthresholds = { sell: 2, buy: 1, Lagerneed: 1, Lagerhave: 1.5 }
     var Zwischenprodukte = { G: 5000, LHO2: 5000, KHO2: 5000, GH2O: 5000, GHO2: 5000 }
     var ZPthresholds = { Lagerneed: 1, Lagerhave: 1.1 }
     var Endprodukte = { XLHO2: 10000, XKHO2: 10000, XGH2O: 5000, XGHO2: 10000, XZH2O: 5000 }
@@ -321,16 +329,24 @@ module.exports.loop = function () {
                     var buyorders = Game.market.getAllOrders(order => order.type == ORDER_BUY && order.resourceType == mineral && order.remainingAmount > 100)
                     buyorders = _.sortByOrder(buyorders, 'price', 'desc')
                     sellorders = _.sortByOrder(sellorders, 'price', 'asc')
-                    console.log('buyorder: ' + buyorders[0].price + ' -- sellorder: ' + sellorders[0].price)
+                    if (buyorders.length < 1) {         // Wenn keine Buyorders vorhanden sind wird eine Dummy Order erstellte. Wenn die Sellorder unter dem Preis liegt dann wird gekauft, ansonsten eine neue Buyorder mit dem Preis erstellt
+                        var buyorders = []
+                        buyorders[0] = { price: 0 }
+                    }
+                    if (sellorders.length < 1) {        // Wenn keine Sellorder dann ähnlich wie oben!
+                        var sellorders = []
+                        sellorders[0] = { price: 1.5 }
+                    }
+                    //console.log('buyorder: ' + buyorders[0].price + ' -- sellorder: ' + sellorders[0].price)
                     if (buyorders[0].price - 0.002 > sellorders[0].price) {  //Wenn Buyorder.price größer dann direkt verkaufen
                         var tradeamount
                         if (buyorders[0].remainingAmount < MinGesamtsell + 5000) { tradeamount = buyorders[0].remainingAmount } else { tradeamount = MinGesamtsell + 5000 }
-                        console.log(buyorders[0].id, tradeamount, MinGesamtmax)
+                        console.log(mineral, buyorders[0].id, tradeamount, MinGesamtmax)
                         ant = Game.market.deal(buyorders[0].id, tradeamount, MinGesamtmax)
                         if (ant == 0) {
                             console.log(MinGesamtmax + ' verkaufte ' + mineral + ' um ' + buyorders[0].price)
                         } else {
-                            console.log('Fehler beim verkaufen in ' + MinGesamtmax + ' Code: ' + ant)
+                            console.log('Fehler beim verkaufen von ' + tradeamount + mineral + ' in ' + MinGesamtmax + ' Code: ' + ant)
                         }
                     } else {
                         var tradeprice = sellorders[0].price - 0.002
@@ -693,8 +709,9 @@ module.exports.loop = function () {
 
     //     }
     // }
-
+    var creepsanzahl = 0
     for (var name in Game.creeps) {
+        creepsanzahl += 1
         var creep = Game.creeps[name];
         var ccpuvor = Game.cpu.getUsed()
         if (creep.memory.role == 'carry2') {
@@ -788,6 +805,7 @@ module.exports.loop = function () {
         // }
 
     }
+    //console.log (creepsanzahl)
     //Minerals suchen
     // var srooms = Memory.Empire.rooms
     // var mtype = 'XGH2O'
@@ -837,8 +855,8 @@ module.exports.loop = function () {
     }
     console.log('CPU renew:', Game.cpu.getUsed() - renewCPUvor)
 
-    //var monroom = 'W7S15'
-    //console.log(monroom + ': RCL' + Game.rooms[monroom].controller.level, Game.rooms[monroom].controller.progress + ' / ' + Game.rooms[monroom].controller.progressTotal + ' --> ' + (Game.rooms[monroom].controller.progressTotal - Game.rooms[monroom].controller.progress) + ' left')
+    var monroom = 'W7S19'
+    console.log(monroom + ': RCL' + Game.rooms[monroom].controller.level, Game.rooms[monroom].controller.progress + ' / ' + Game.rooms[monroom].controller.progressTotal + ' --> ' + (Game.rooms[monroom].controller.progressTotal - Game.rooms[monroom].controller.progress) + ' left')
     var GCLvor = Memory.GCL
     var GCLnach = Math.ceil(Game.gcl.progress)
     var GCLdif = GCLnach - GCLvor

@@ -184,7 +184,7 @@ var reactions = {
                             }
                         }
                     } else if (rezept.rezept[labtype].type == 'prod') {
-                        if (_.sum(terminal.store) < 250000) {
+                        if (_.sum(terminal.store) < 290000) {
                             if (lab.mineralAmount > 500) {
                                 minhave.push({ id: lab.id, type: 'lab', res: rezept.rezept[labtype].mineral, amount: lab.mineralAmount, pos: lab.pos })
                             }

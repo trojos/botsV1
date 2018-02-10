@@ -1,18 +1,21 @@
 var buildroad = {
 
-  run: function (frompos, topos, build) {
+  run: function (frompos, topos, build, maxRooms) {
 
     var noroom = false
+    topos = { pos: topos, range: 1 }
+    if (maxRooms == undefined) { maxRooms = 16 }
+    //console.log(maxRooms)
     var xpath = PathFinder.search(frompos, topos,
       {
         // We need to set the defaults costs higher so that we
         // can set the road cost lower in `roomCallback`
         plainCost: 2,
         swampCost: 3,
+        maxRooms: maxRooms,
 
         roomCallback: function (roomName) {
           let room = Game.rooms[roomName];
-
           // In this example `room` will always exist, but since 
           // PathFinder supports searches which span multiple rooms 
           // you should be careful!
@@ -53,6 +56,7 @@ var buildroad = {
           return costs;
         },
       })
+
     if (build == 1 && !noroom) {
       //console.log('Baue Straße von:', frompos, 'nach', topos, xpath.path.length)
       for (var steps in xpath.path) {

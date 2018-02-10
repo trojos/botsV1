@@ -205,37 +205,55 @@ var subroom = {
                 }
             }
         }
-        //if (subroom == 'W4S16') {
-        if (Memory.rooms[subroom].Straßenbau == undefined) { Memory.rooms[subroom].Straßenbau = {} }
-        if ((Memory.rooms[subroom].Straßenbau.tick == undefined) || Memory.rooms[subroom].Straßenbau.tick < Game.time - 500 && Memory.rooms[subroom].Straßenbau.fertig == true) {
-            Memory.rooms[subroom].Straßenbau = {}
-            Memory.rooms[subroom].Straßenbau.tick = Game.time
-            Memory.rooms[subroom].Straßenbau.fertig = false
-            Memory.rooms[subroom].Straßenbau.Schritt = 0
-        }
-        if (Memory.rooms[subroom].Straßenbau.fertig == false) {
-            if (insight) {
-                var spots = Game.rooms[subroom].find(FIND_SOURCES)
-                var minerals = Game.rooms[subroom].find(FIND_MINERALS)
-                spots.push(minerals[0])
-                Memory.rooms[subroom].Straßenbau.Gesamtschritte = spots.length
-                if (Memory.rooms[subroom].Straßenbau.Schritt < Memory.rooms[subroom].Straßenbau.Gesamtschritte) {
-                    //Straßen bauen
-                    if (insight) {
-                        var start
-                        if (Game.rooms[room].storage) {
-                            start = Game.rooms[room].storage.pos
-                        } else {
-                            start = Game.rooms[room].find(FIND_MY_SPAWNS)[0].pos
-                        }
-                        buildroad.run(start, spots[Memory.rooms[subroom].Straßenbau.Schritt].pos, 1)
-                    }
-                } else {
-                    Memory.rooms[subroom].Straßenbau.fertig = true
-                }
-                Memory.rooms[subroom].Straßenbau.Schritt += 1
+        //if (subroom == 'W6S16') {
+            if (Memory.rooms[subroom].Straßenbau == undefined) { Memory.rooms[subroom].Straßenbau = {} }
+            if ((Memory.rooms[subroom].Straßenbau.tick == undefined) || Memory.rooms[subroom].Straßenbau.tick < Game.time - 500 && Memory.rooms[subroom].Straßenbau.fertig == true) {
+                Memory.rooms[subroom].Straßenbau = {}
+                Memory.rooms[subroom].Straßenbau.tick = Game.time
+                Memory.rooms[subroom].Straßenbau.fertig = false
+                Memory.rooms[subroom].Straßenbau.Schritt = 0
             }
-        }
+            if (Memory.rooms[subroom].Straßenbau.fertig == false) {
+                if (insight) {
+                    var spots = Game.rooms[subroom].find(FIND_SOURCES)
+                    var minerals = Game.rooms[subroom].find(FIND_MINERALS)
+                    spots.push(minerals[0])
+                    Memory.rooms[subroom].Straßenbau.Gesamtschritte = spots.length + 6
+                    if (Memory.rooms[subroom].Straßenbau.Schritt < Memory.rooms[subroom].Straßenbau.Gesamtschritte) {
+                        //Straßen bauen
+                        if (insight) {
+                            var start
+                            //if (Memory.rooms[subroom].Straßenbau.Schritt < 4) {  // Zuerst von spots zu home
+                            if (Game.rooms[room].storage) {
+                                start = Game.rooms[room].storage.pos
+                            } else {
+                                start = Game.rooms[room].find(FIND_MY_SPAWNS)[0].pos
+                            }
+                            //buildroad.run(start, spots[Memory.rooms[subroom].Straßenbau.Schritt].pos, 1)
+                            //} else {
+                            var build = 1       //0 = nur anzeigen, 1 = bauen
+                            //console.log(Memory.rooms[subroom].Straßenbau.Schritt)
+                            switch (Memory.rooms[subroom].Straßenbau.Schritt) {
+                                case 0: buildroad.run(spots[0].pos, start, build); break;
+                                case 1: buildroad.run(spots[1].pos, start, build); break;
+                                case 2: buildroad.run(spots[2].pos, start, build); break;
+                                case 3: buildroad.run(spots[3].pos, start, build); break;
+                                case 4: buildroad.run(spots[0].pos, spots[1].pos, build, 1); break;
+                                case 5: buildroad.run(spots[0].pos, spots[2].pos, build, 1); break;
+                                case 6: buildroad.run(spots[0].pos, spots[3].pos, build, 1); break;
+                                case 7: buildroad.run(spots[1].pos, spots[3].pos, build, 1); break;
+                                case 8: buildroad.run(spots[1].pos, spots[2].pos, build, 1); break;
+                                case 9: buildroad.run(spots[2].pos, spots[3].pos, build, 1); break;
+                                default: break;
+                            }
+                            //}
+                        }
+                    } else {
+                        Memory.rooms[subroom].Straßenbau.fertig = true
+                    }
+                    Memory.rooms[subroom].Straßenbau.Schritt += 1
+                }
+            }
         //}
 
         // Keeper pos und spawnzeiten in Memory schreiben

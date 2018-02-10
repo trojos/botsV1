@@ -32,7 +32,7 @@ function attacktarget(creep, target, hostileroom) {
                             if (creeponpath.length > 0) {
                                 //console.log(creep.name, 'hinderniss')
                                 creep.room.visual.circle(path[0].x, path[0].y, { fill: '#ff0000', radius: .5 })
-                                if (creeponpath[0].memory.role == 'Heiler' || creeponpath[0].memory.role == 'FernDD') {
+                                if (creeponpath[0].memory.role == 'Heiler' || creeponpath[0].memory.role == 'FernDD'|| creeponpath[0].memory.role == 'scout') {
                                     creeponpath[0].moveTo(creep)
                                 } else if (creeponpath[0].memory.role == 'NahDD') {
                                     creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' }, ignoreDestructibleStructures: true, ignoreCreeps: false, maxRooms: 1 });

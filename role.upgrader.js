@@ -56,7 +56,7 @@ var roleUpgrader = {
                     filter: (s) => s.structureType == STRUCTURE_CONTAINER
                         && s.store[RESOURCE_ENERGY] > 100
                 })
-                var droppedatsource = target.pos.findInRange(FIND_DROPPED_RESOURCES, 3)
+                var droppedatsource = target.pos.findInRange(FIND_DROPPED_RESOURCES, 15)
                 if (droppedatsource.length > 0) {
                     if (creep.pickup(droppedatsource[0]) == ERR_NOT_IN_RANGE) {
                         creep.moveTo2(droppedatsource[0], { reusePath: 50, ignoreCreeps: false });

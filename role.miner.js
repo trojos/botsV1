@@ -43,8 +43,13 @@ var roleMiner = {
                 if (creep.room.name == creep.memory.home) {
                     var target = Game.getObjectById(creep.memory.resourcelink)
                     if (target) {
-                        if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        var erg = creep.transfer(target, RESOURCE_ENERGY)
+                        //console.log(creep.memory.targetroom, erg)
+                        if (erg == ERR_NOT_IN_RANGE) {
                             creep.moveTo(target);
+                        } else if (erg == ERR_FULL) {
+                            creep.drop(RESOURCE_ENERGY)
+                            creep.memory.harvesting = true;
                         } else {
                             creep.memory.harvesting = true;
                         }

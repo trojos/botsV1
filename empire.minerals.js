@@ -78,6 +78,60 @@ var minerals = {
             }
         }
 
+        //Terminal voll --> an Market verkaufen
+        if (Game.rooms[room].terminal) {
+            if (Game.rooms[room].terminal.cooldown == 0) {
+                var mstore
+                var mstores
+                mstore = (Game.rooms[room].terminal.store)
+
+                if (_.sum(mstore) > 280000) {
+                    var amount
+                    var maxres
+                    amount = 0
+                    for (var re in mstore) {
+                        if (mstore[re] > amount && re != 'energy') {
+                            amount = mstore[re]
+                            maxres = re
+                        }
+                    }
+                    console.log(room, maxres)
+                }
+                if (maxres) {
+                    var orders
+                    orders = Game.market.getAllOrders(order => order.type == ORDER_BUY && order.resourceType == maxres && order.remainingAmount > 100)
+                    orders = _.sortByOrder(orders, 'price', 'desc')
+                    //console.log(JSON.stringify(orders))
+                    console.log(JSON.stringify(orders[0]))
+                    var tradeamount
+                    if (orders[0].remainingAmount > 10000) { tradeamount = 10000 } else { tradeamount = orders[0].remainingAmount }
+                    var cost = Game.market.calcTransactionCost(tradeamount, room, orders[0].roomName)
+                    var ant
+                    if (Game.rooms[room].terminal.store.energy >= cost) {
+                        ant = Game.market.deal(orders[0].id, tradeamount, room)
+                    } else { ant = 'Zu wenig Energy' }
+                    if (ant == 0) {
+                        console.log(room + ' NOTVERKAUF ' + tradeamount + ' ' + maxres + ' um ' + orders[0].price)
+                    } else {
+                        console.log('Fehler beim verkaufen in ' + room + ' Code: ' + ant)
+                    }
+                }
+                //ant = Game.market.deal('58bc4fc53751622a41f77ee5',10000,'E99S83')
+                //ant = Game.market.createOrder(ORDER_SELL, RESOURCE_HYDROGEN, 0.29, 1000, 'E98S81')
+                //ant = Game.market.calcTransactionCost(5000,'E98S81', 'W0N50')
+                //console.log(ant)
+            }
+        }
+
+
+
+
+
+
+
+
+
+
         return (false)
     }
 
