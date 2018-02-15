@@ -100,7 +100,7 @@ var subroomclaim = {
             }
         }
         //---------- Upgrader  ---------- bis kleiner RCL 4
-        if (insight && !wait && claimsuccess&& !needbmstr) {
+        if (insight && !wait && claimsuccess && !needbmstr) {
             if (Game.rooms[subroom].controller.level < 4) {
                 var spot = Game.rooms[subroom].controller.pos.findClosestByRange(FIND_SOURCES)
                 var cmem = { role: 'upgrader', spot: spot.id, home: room, targetroom: subroom, upgrading: false }
@@ -116,9 +116,13 @@ var subroomclaim = {
                 }
             }
         }
-        //---------- Deliver  ---------- bis kleiner RCL 5
-        if (insight && !wait && claimsuccess && !needbmstr && !needupgrader) {
-            if (Game.rooms[subroom].controller.level < 5) {
+        //---------- Deliver  ---------- bis kleiner RCL 6
+
+        if (insight && !wait && claimsuccess && !needbmstr && !needupgrader && reserve > 150000) {
+            if (Game.rooms[subroom].storage) {
+                var subthre = Game.rooms[subroom].storage.store.energy
+            } else { var subthre = 0 }
+            if (Game.rooms[subroom].controller.level < 6 && subthre < 300000) {
                 var cmem = { role: 'deliver', home: room, targetroom: subroom }
                 var cbody = [MOVE, CARRY]
                 if (maxcreepsize > 2500) { creepsize = 2500 } else { creepsize = maxcreepsize }    // Beschränkt maxcreepsize
@@ -130,7 +134,7 @@ var subroomclaim = {
                     creepspawn.newcreep(room, 'deliver_' + subroom, creepsize, cbody, cmem)
                 }
             } else {
-                console.log(subroom, 'hat RCL 5 erreicht, kein Claim mehr nötig!')
+                console.log(subroom, 'hat RCL 6 erreicht, kein Claim mehr nötig!')
             }
         }
 
@@ -156,7 +160,7 @@ var subroomclaim = {
                         needdef = true
                     }
                 }
-            } 
+            }
         }
 
         //subräume

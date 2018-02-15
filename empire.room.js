@@ -844,7 +844,9 @@ var empireroom = {
                 var dropped = Game.rooms[room].find(FIND_DROPPED_RESOURCES)
                 dropped.forEach(drop => {
                     //if (drop.resourceType == RESOURCE_ENERGY) {
-                    energysource.push({ id: drop.id, type: 'drop', res: drop.resourceType, amount: drop.amount, pos: drop.pos })
+                    if (room != 'W2S19') {
+                        energysource.push({ id: drop.id, type: 'drop', res: drop.resourceType, amount: drop.amount, pos: drop.pos })
+                    }
                     // }
                 })
                 if (centerli) {
@@ -959,7 +961,7 @@ var empireroom = {
                 //spawn harvester mit spot im memory
                 var cmem = { role: 'min_harv', spot: mineralspot.id, home: room, targetroom: room }
                 var cbody = [WORK, WORK, MOVE, CARRY]
-                if (maxcreepsize > 3500) { creepsize = 3500 } else { creepsize = maxcreepsize }    // Beschränkt maxcreepsize
+                if (maxcreepsize > 3700) { creepsize = 3700 } else { creepsize = maxcreepsize }    // Beschränkt maxcreepsize
                 var ccreep = _.filter(Game.creeps, (creep) =>
                     creep.memory.role == cmem.role
                     && creep.memory.spot == cmem.spot

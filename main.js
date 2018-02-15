@@ -1,26 +1,16 @@
-//var setMemoryLocation = require('set.Memory.Location')
-//var setMemorycreepneed = require('set.Memory.creepneed')
-
 var roleMiner = require('role.miner');
 var roleUpgrader = require('role.upgrader');
 var roleUpgraderStorage = require('role.upgraderstorage')
-
 var rolelooter = require('role.looter')
-
 var rolecarry = require('role.carry.old');
 var rolecarry2 = require('role.carry2');
 var roleBmstr = require('role.bmstr');
 var roledestruct = require('role.destruct');
 var roledeliver = require('role.deliver')
-
 var roledefend = require('role.defend')
-
 var rolescout = require('role.scout')
-//var roleattack = require('role.NahDD')
 var roleClaim = require('role.claim')
-
 var roleMinHarv = require('role.MinHarv')
-
 var rolekeeperscout = require('role.keeper.scout')
 var rolekeeperFernDD = require('role.keeper.FernDD')
 var rolekeeperHeal = require('role.keeper.Heiler')
@@ -29,19 +19,12 @@ var rolekeepercarry = require('role.keeper.carry')
 var rolekeeperbmstr = require('role.keeper.bmstr')
 var rolekeeperminer = require('role.keeper.miner')
 var rolekeeperMinHarv = require('role.keeper.MinHarv')
-
-//var buildstrucwall = require('build.struc.wall');
-//var buildroad = require('build.roads');
-
 var towerattack = require('tower.attack')
-
 var empireroom = require('empire.room')
 var reactions = require('empire.reactions')
 var mineralrezepte = require('mineral.rezepte')
-//var creepspawn = require('creepspawn')
-
 var squadattack = require('squadattack')
-
+var prototypescreep = require('prototypes.creep')
 //var importlayout = require('build.layouts')
 var exportlayout = require('build.exportlayout')
 
@@ -54,51 +37,10 @@ module.exports.loop = function () {
     Memory.stats['CPU.maininit'] = Game.cpu.getUsed()
     console.log('Init Main ' + Memory.stats['CPU.maininit'])
 
+    prototypescreep.run()
     mineralrezepte.run()
     //importlayout.run()
     //exportlayout.run('W8S16')
-
-    //Protoype für moveTo2 festlegen
-    //Memory.CPUMove2 = 0
-    Creep.prototype.moveTo2 = function (target, opts, keeperroom) {
-        if (opts == undefined) { opts = {} }
-        if (opts.reusePath == undefined) { opts.reusePath = 100 }
-        if (opts.ignoreCreeps == undefined) { opts.ignoreCreeps = true }
-        if (keeperroom) {
-            var rn = this.room.name
-            if (Memory.rooms[rn]) {
-                opts.costCallback = function (roomName) { return PathFinder.CostMatrix.deserialize(Memory.rooms[rn].savetravel) }
-            }
-        }
-        var me = this.moveTo(target, opts);
-        if (me == -2) { delete this.memory._move }
-        //var cpuvor = Game.cpu.getUsed()
-        if (this.memory._move == undefined) {
-        } else {
-            if (this.memory._move.tile == undefined) {
-                this.memory._move.tile = this.pos
-                this.memory._move.ontile = 0
-            } else {
-                if (this.pos.isEqualTo(new RoomPosition(this.memory._move.tile.x, this.memory._move.tile.y, this.memory._move.tile.roomName))) {
-                    this.memory._move.ontile += 1
-                } else {
-                    this.memory._move.ontile = 0
-                }
-                if (this.memory._move.ontile >= 3) {
-                    this.memory._move = {}
-                    opts.reusePath = 5
-                    opts.ignoreCreeps = false
-                    delete opts.costCallback
-                    this.moveTo(target, opts);
-                } else {
-                    this.memory._move.tile = this.pos
-                }
-            }
-        }
-        //var cpunach = Game.cpu.getUsed()
-        //Memory.CPUMove2 += cpunach - cpuvor
-        return me
-    }
 
     // Text für Controller.sign 
     Memory.signtext = "Hallo"
@@ -124,11 +66,12 @@ module.exports.loop = function () {
         reactions.run('W7S15', 'GH2O')
         reactions.run('W7S17', 'LHO2');
         reactions.run('W4S17', 'G')
-        reactions.run('W3S18', 'GHO2');
+        reactions.run('W3S18', 'GH2O');
         reactions.run('W1S17', 'ZweixXGH2O')
         reactions.run('W8S16', 'G')
         reactions.run('W6S18', 'G')
         reactions.run('W7S19', 'G')
+        reactions.run('W7S14', 'G')
         //('reaction CPU: ' + (Game.cpu.getUsed() - reactionsvor))
     }
 
@@ -161,7 +104,7 @@ module.exports.loop = function () {
         { targetroom: 'W3S17', todo: 'harvest' },
         { targetroom: 'W5S17', todo: 'harvest' },
         { targetroom: 'W4S16', todo: 'keeper' },
-        { targetroom: 'W6S19', todo: 'attack', type: 1, NahDD: 0, FernDD: 2, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
+        //{ targetroom: 'W6S19', todo: 'attack', type: 1, NahDD: 0, FernDD: 2, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
         //{ targetroom: 'W7S19', todo: 'claim' },
     ])
     empireroom.run('W7S17', [
@@ -179,7 +122,7 @@ module.exports.loop = function () {
         { targetroom: 'W6S15', todo: 'keeper' },
         { targetroom: 'W5S15', todo: 'keeper' },
         //{ targetroom: 'W7S14', todo: 'attack', type: 1, NahDD: 0, FernDD: 1, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
-        { targetroom: 'W7S14', todo: 'claim' },
+        //{ targetroom: 'W7S14', todo: 'claim' },
     ])
     empireroom.run('W8S16', [
         { targetroom: 'W9S17', todo: 'harvest' },
@@ -191,14 +134,12 @@ module.exports.loop = function () {
         { targetroom: 'W5S19', todo: 'harvest' },
         //{ targetroom: 'W7S19', todo: 'claim' },
         //{ targetroom: 'W6S19', todo: 'bmstr' },
-
     ])
     empireroom.run('W7S19', [
-        //{ targetroom: 'W6S19', todo: 'harvest' },
-        //{ targetroom: 'W7S18', todo: 'harvest' },
+        { targetroom: 'W6S19', todo: 'harvest' },
     ])
     empireroom.run('W7S14', [
-        //{ targetroom: 'W6S19', todo: 'harvest' },
+        { targetroom: 'W8S14', todo: 'harvest' },
         //{ targetroom: 'W7S18', todo: 'harvest' },
     ])
 
@@ -805,7 +746,6 @@ module.exports.loop = function () {
         // }
 
     }
-    //console.log (creepsanzahl)
     //Minerals suchen
     // var srooms = Memory.Empire.rooms
     // var mtype = 'XGH2O'
@@ -831,7 +771,7 @@ module.exports.loop = function () {
     // }
 
     //CREEP die bei Spawn sind renewen
-    var renewCPUvor = Game.cpu.getUsed()
+    //var renewCPUvor = Game.cpu.getUsed()
     var rrooms = Memory.Empire.rooms
     for (const rroom in rrooms) {
         var rspawns = Game.rooms[rroom].find(FIND_MY_SPAWNS, {
@@ -853,10 +793,11 @@ module.exports.loop = function () {
             }
         })
     }
-    console.log('CPU renew:', Game.cpu.getUsed() - renewCPUvor)
+    //console.log('CPU renew:', Game.cpu.getUsed() - renewCPUvor)
 
-    var monroom = 'W7S19'
-    console.log(monroom + ': RCL' + Game.rooms[monroom].controller.level, Game.rooms[monroom].controller.progress + ' / ' + Game.rooms[monroom].controller.progressTotal + ' --> ' + (Game.rooms[monroom].controller.progressTotal - Game.rooms[monroom].controller.progress) + ' left')
+    //var monroom = 'W7S19'
+    //console.log(monroom + ': RCL' + Game.rooms[monroom].controller.level, Game.rooms[monroom].controller.progress + ' / ' + Game.rooms[monroom].controller.progressTotal + ' --> ' + (Game.rooms[monroom].controller.progressTotal - Game.rooms[monroom].controller.progress) + ' left')
+    
     var GCLvor = Memory.GCL
     var GCLnach = Math.ceil(Game.gcl.progress)
     var GCLdif = GCLnach - GCLvor

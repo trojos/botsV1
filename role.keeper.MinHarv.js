@@ -1,16 +1,16 @@
 function avoidkeeper(creep, abstand) {
-    if (Memory.rooms[creep.room.name].keeper == undefined){} else {
-    if (Memory.rooms[creep.room.name].keeper.invaders) {
-        var keepers = creep.pos.findInRange(FIND_HOSTILE_CREEPS, abstand)
-    } else {
-        var keepers = Memory.rooms[creep.room.name].keeper.keepers
-    }
-    for (var i in keepers) {
-        if (creep.pos.inRangeTo(keepers[i].pos, abstand)) {
-            var fleepath = PathFinder.search(creep.pos, { pos: keepers[i].pos, range: (abstand + 3) }, { flee: true })
-            creep.moveByPath(fleepath.path, { visualizePathStyle: { stroke: '#FA8258' } })
+    if (Memory.rooms[creep.room.name].keeper == undefined) { } else {
+        if (Memory.rooms[creep.room.name].keeper.invaders) {
+            var keepers = creep.pos.findInRange(FIND_HOSTILE_CREEPS, abstand)
+        } else {
+            var keepers = Memory.rooms[creep.room.name].keeper.keepers
         }
-    }
+        for (var i in keepers) {
+            if (creep.pos.inRangeTo(keepers[i].pos, abstand)) {
+                var fleepath = PathFinder.search(creep.pos, { pos: keepers[i].pos, range: (abstand + 3) }, { flee: true })
+                creep.moveByPath(fleepath.path, { visualizePathStyle: { stroke: '#FA8258' } })
+            }
+        }
     }
 }
 function avoidlair(creep, abstand) {
@@ -46,7 +46,11 @@ var roleMinHarv = {
         if (creep.memory.harvesting && _.sum(creep.carry) == creep.carryCapacity) {
             creep.memory.harvesting = false;
         }
-        var weg = Memory.rooms[targetroom].Wege[creep.memory.spot].Spawn.cost
+        if (Memory.rooms[targetroom].Wege[creep.memory.spot] == undefined) {
+            var weg = 100
+        } else {
+            var weg = Memory.rooms[targetroom].Wege[creep.memory.spot].Spawn.cost
+        }
         if (creep.ticksToLive < weg * 2) {               //Wenn Bald tot dann wird ausgeleert und dann destruct damit nix liegenbleibt!
             creep.memory.harvesting = false           //TODO --> Länge minerspot - terminal ermitteln, in memory speichern und tickstolive aufgrund dessen ermitteln
             if (_.sum(creep.carry) == 0) {
@@ -67,7 +71,7 @@ var roleMinHarv = {
                         var avoidl = true
                     } else { var avoidl = false }
                 } else { avoidl = false }
-    
+
                 if (avoidl) {
                 } else {
                     if (creep.harvest(targetsource) == ERR_NOT_IN_RANGE) {

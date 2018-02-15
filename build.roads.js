@@ -61,7 +61,9 @@ var buildroad = {
       //console.log('Baue Straße von:', frompos, 'nach', topos, xpath.path.length)
       for (var steps in xpath.path) {
         var xroom = xpath.path[steps].roomName
-        Game.rooms[xroom].createConstructionSite(xpath.path[steps].x, xpath.path[steps].y, STRUCTURE_ROAD)
+        if (Game.rooms[xroom]) {
+          Game.rooms[xroom].createConstructionSite(xpath.path[steps].x, xpath.path[steps].y, STRUCTURE_ROAD)
+        }
 
       }
     } else if (build == 0 && !noroom) {
