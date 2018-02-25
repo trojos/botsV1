@@ -36,6 +36,7 @@ var rolekeeperFernDD = {
     run: function (creep) {
         var home = creep.memory.home
         var targetroom = creep.memory.targetroom
+        //Wenn keeper in der nähe wird dieser angegriffen und nicht der den room sagt
         var keeperinRange = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 4, {
             filter: { owner: { username: 'Source Keeper' } }
         })
@@ -57,10 +58,24 @@ var rolekeeperFernDD = {
             if (!creep.pos.isNearTo(spawn)) { creep.moveTo2(spawn) }
         } else {
             if (creep.room.name == targetroom) {
-                var healtars = creep.pos.findInRange(FIND_MY_CREEPS, 1, { filter: sa => sa.hits < sa.hitsMax })
-                var healtar = _.min(healtars, 'hits')
-                creep.heal(healtar)
+                //Heilt alles wenn es zufällig in der Nähe ist
+                if (creep.hits < creep.hitsMax) {
+                    creep.heal(creep)
+                } else {
+                    var healtars = creep.pos.findInRange(FIND_MY_CREEPS, 3, { filter: sa => sa.hits < sa.hitsMax })
+                    var healtar = _.min(healtars, 'hits')
+                    if (creep.pos.isNearTo(healtar)) {
+                        creep.heal(healtar)
+                    } else {
+                        if (creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3).length > 0) {
+                            console.log('targets in reich', creep.name)
+                        } else { creep.rangedHeal(healtar) }
 
+                    }
+                }
+
+
+                // Wenn in Invaders
                 if (Memory.rooms[targetroom].keeper.invaders) {
                     invaders = Game.rooms[targetroom].find(FIND_HOSTILE_CREEPS, {
                         filter: { owner: { username: 'Invader' } }
@@ -85,36 +100,45 @@ var rolekeeperFernDD = {
                     } else {
                         Memory.rooms[targetroom].keeper.invaders = false
                     }
+                    console.log(creep.room.name, invader, rangetotarget)
                     if (rangetotarget >= 7) {
-                        creep.moveTo2(invader, { reusePath: 20 }, false)
+                        creep.moveTo2(invader, { maxRooms: 1, reusePath: 20, range: 3 }, false)
                     } else if (rangetotarget < 7 && rangetotarget > 3) {
-                        creep.moveTo2(invader, { reusePath: 0 }, false)
+                        creep.moveTo2(invader, { maxRooms: 1, reusePath: 0, range: 3 }, false)
                     } else if (rangetotarget <= 3) {
                         var at = 1
                         creep.rangedAttack(invader)
+                        // if (Game.time % 2 == 0) {
+                        //     const targets = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
+                        //     if (targets.length > 1) {
+                        //creep.rangedMassAttack();
+                        //  }
+                        //}
                         avoidkeeper(creep, 2)
                     }
 
                 } else {
+                    // Greife Targetkeeper an
                     if (targetkeeper) {
                         var rangetotarget = creep.pos.getRangeTo(targetkeeper.pos.x, targetkeeper.pos.y)
                         if (rangetotarget >= 7) {
-                            creep.moveTo2(targetkeeper, { reusePath: 20 }, false)
+                            creep.moveTo2(targetkeeper, { maxRooms: 1, reusePath: 20, range: 3 }, false)
                         } else if (rangetotarget < 7 && rangetotarget > 3) {
-                            creep.moveTo2(targetkeeper, { reusePath: 0 }, false)
+                            creep.moveTo2(targetkeeper, { maxRooms: 1, reusePath: 0, range: 3 }, false)
                         } else if (rangetotarget <= 3) {
                             var at = 1
                             creep.rangedAttack(targetkeeper)
                             avoidkeeper(creep, 2)
                         }
-                    } else {
-                        var waitpoint = Memory.rooms[targetroom].spots[Memory.rooms[targetroom].keeper.nextspot].waitpoint
+                    } else {        // Wenn keiner da wird zum laier mit dem niedricgsten tts gegangen (Bestimmt der raum)
+                        var waitpoint = Memory.rooms[targetroom].spots.spots[Memory.rooms[targetroom].keeper.nextspot].waitpoint
                         var waitpoint = new RoomPosition(waitpoint.x, waitpoint.y, waitpoint.roomName)
-                        creep.moveTo2(waitpoint, { reusePath: 20 }, true)
+                        creep.moveTo2(waitpoint, { maxRooms: 1, reusePath: 20 }, true)
                         if (creep.ticksToLive < tts) {
                             creep.memory.role = 'destruct'
                         }
                     }
+                    //Wenn stark beschädigt gehe zu heal oder weg
                     if (creep.hits < 2000) {
                         heals = creep.pos.findInRange(FIND_MY_CREEPS, 10, {
                             filter: { role: 'keeperheal' }

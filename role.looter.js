@@ -3,7 +3,7 @@ var rolelooter = {
     /** @param {Creep} creep **/
     run: function (creep) {
 
-        if (!creep.memory.harvesting && creep.carry.energy == 0) {
+        if (!creep.memory.harvesting && _.sum(creep.carry) == 0) {
             creep.memory.harvesting = true;
         }
         if (creep.memory.harvesting && _.sum(creep.carry) == creep.carryCapacity) {
@@ -29,18 +29,18 @@ var rolelooter = {
             }
         } else {        //----------- Ausliefern --------------
             if (_.sum(creep.carry) == creep.carry.energy) {
-                var targets = creep.room.find(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return ((structure.structureType == STRUCTURE_EXTENSION ||
-                            structure.structureType == STRUCTURE_SPAWN ||
-                            structure.structureType == STRUCTURE_LAB) &&
-                            structure.energy < structure.energyCapacity) ||
-                            (structure.structureType == STRUCTURE_TERMINAL &&
-                                structure.store.energy < 20000 && structure.isActive()) ||
-                            (structure.structureType == STRUCTURE_TOWER &&
-                                structure.energy < 900)
-                    }
-                });
+                 var targets //= creep.room.find(FIND_STRUCTURES, {
+                //     filter: (structure) => {
+                //         return ((structure.structureType == STRUCTURE_EXTENSION ||
+                //             structure.structureType == STRUCTURE_SPAWN ||
+                //             structure.structureType == STRUCTURE_LAB) &&
+                //             structure.energy < structure.energyCapacity) ||
+                //             (structure.structureType == STRUCTURE_TERMINAL &&
+                //                 structure.store.energy < 20000 && structure.isActive()) ||
+                //             (structure.structureType == STRUCTURE_TOWER &&
+                //                 structure.energy < 900)
+                //     }
+                // });
 
                 var links = creep.pos.findInRange(FIND_STRUCTURES, 3, {
                     filter: (structure) => {

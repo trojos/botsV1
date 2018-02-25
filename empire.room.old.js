@@ -191,7 +191,7 @@ var empireroom = {
         var bmstrsites = Game.rooms[room].find(FIND_MY_CONSTRUCTION_SITES)
         //if (Memory.rooms[room].Bmstr.tick == undefined || Memory.rooms[room].Bmstr.tick < Game.time - 510) {
         //console.log(room,bmstrsites.length,Memory.rooms[room].Bmstr.constructionsites,Memory.rooms[room].Bmstr.baubodyparts)
-        //var CPUvorBau = Game.cpu.getUsed()
+        var CPUvorBau = Game.cpu.getUsed()
         if (Memory.rooms[room].Bmstr.constructionsites != bmstrsites.length || Memory.rooms[room].Bmstr.tick < Game.time - 15) {
             Memory.Bmstr = {}
             Memory.rooms[room].Bmstr.tick = Game.time
@@ -271,7 +271,7 @@ var empireroom = {
                 var wallBP = buildwall.length / 50;
             }
             Memory.rooms[room].Bmstr.wallbodyparts = Math.ceil(wallBP)
-            //console.log('CPU_Bau ', Game.cpu.getUsed() - CPUvorBau)
+            console.log('CPU_Bau ', Game.cpu.getUsed() - CPUvorBau)
         }
 
         //Set Memory für Links
@@ -788,15 +788,14 @@ var empireroom = {
         //var CPUDefendercor = Game.cpu.getUsed()
         for (var l in defender) {                                     //Ausführen der Rollen
             var creepat = defender[l]
-            //var CPUDefendercor = Game.cpu.getUsed()
+            var CPUDefendercor = Game.cpu.getUsed()
 
             if (boost) {
                 if (creepat.memory.role == 'Heiler') {
                     //creepboost.run(creepat, creepat.memory.home, HEAL, 'XLHO2', 20)
                 }
-                if (creepat.memory.role == 'FernDD') {
-                    var cboost = [{ BP: RANGED_ATTACK, mineral: 'XKHO2', max: 25 }]
-                    creepboost.run(creep, creep.memory.home, cboost)
+                if (creepat.memory.role == 'FernDD' || creepat.memory.role == 'NahDD') {
+                    creepboost.run(creepat, creepat.memory.home, RANGED_ATTACK, 'XKHO2', 25)
                 }
 
             }
@@ -804,7 +803,7 @@ var empireroom = {
             if ((creepat.memory.role == 'NahDD' || creepat.memory.role == 'FernDD') && creepat.memory.targetroom == room) {
                 if (creepat.memory.boosted == 'goto') { } else {
                     roleNahDD.run(creepat)
-                    //console.log('Defender CPU(empire.room,619)', room, Game.cpu.getUsed() - CPUDefendercor)
+                    console.log('Defender CPU(empire.room,619)', room, Game.cpu.getUsed() - CPUDefendercor)
                 }
             } else if ((creepat.memory.role == 'Heiler') && creepat.memory.targetroom == room) {
                 if (creepat.memory.boosted == 'goto') { } else {
@@ -964,6 +963,8 @@ var empireroom = {
                 }
                 //}
             }
+
+
 
             if (Memory.rooms[room].Lager) {
                 var lager = Game.getObjectById(Memory.rooms[room].Lager)
@@ -1178,11 +1179,10 @@ var empireroom = {
 
         Memory.rooms[room].RCL = HomeRCL
 
-        var xspawnr = _.filter(xspawns, (struc) => struc.spawning != null)
-        for (var s in xspawnr) {
-            //console.log(room + ' ' + xspawnr[s].name + ' spawnt:  ' + xspawnr[s].spawning.name + '  in ' + xspawnr[s].spawning.remainingTime + '/' + xspawnr[s].spawning.needTime)
-            new RoomVisual(room).text(xspawnr[s].spawning.name + '  in ' + xspawnr[s].spawning.remainingTime + '/' + xspawnr[s].spawning.needTime, 3, 3 + parseInt(s), { align: 'left' })
-        }
+        // var xspawnr = _.filter(xspawns, (struc) => struc.spawning != null)
+        // for (var s in xspawnr) {
+        //     console.log(room + ' ' + xspawnr[s].name + ' spawnt:  ' + xspawnr[s].spawning.name + '  in ' + xspawnr[s].spawning.remainingTime + '/' + xspawnr[s].spawning.needTime)
+        // }
 
         Memory.stats['rooms.' + room + '.RCL.level'] = HomeRCL
         Memory.stats['rooms.' + room + '.RCL.progress'] = Game.rooms[room].controller.progress

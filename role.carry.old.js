@@ -36,7 +36,7 @@ var rolecarry = {
 
                 if (dropped.length > 0) {
                     if (creep.pickup(dropped[0]) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo2(dropped[0], { reusePath: 50 });
+                        creep.moveTo2(dropped[0], { reusePath: 50, range: 1 });
                     }
                     return;
                 } else if (container.length > 0) {
@@ -44,7 +44,7 @@ var rolecarry = {
                         if (creep.pos.isNearTo(container[c])) {
                             creep.withdraw(container[c], RESOURCE_ENERGY)
                         } else {
-                            creep.moveTo2(container[c], { reusePath: 50 })
+                            creep.moveTo2(container[c], { reusePath: 50, range: 1 })
                         }
                         if (creep.pos.isEqualTo(container[c].pos)) {
                             creep.memory.harvesting = false
@@ -52,18 +52,18 @@ var rolecarry = {
                     }
                     return;
                 } else if (droppedatsource.length > 0) {
-                    creep.moveTo2(droppedatsource[0], { reusePath: 50 })
+                    creep.moveTo2(droppedatsource[0], { reusePath: 50, range: 1 })
                     return;
                 } else {
                     var mineronpos = sourcepos.findInRange(FIND_MY_CREEPS, 1, {
                         filter: (cr) => (cr.memory.role == 'miner')
                     })
                     if (mineronpos.length > 0) {
-                        creep.moveTo2(mineronpos[0].pos)
+                        creep.moveTo2(mineronpos[0].pos, {range: 1})
                     } else {
                         var distsource = creep.pos.getRangeTo(sourcepos)
                         if (distsource > 5) {
-                            creep.moveTo2(sourcepos)
+                            creep.moveTo2(sourcepos, {range: 1})
                         } else if (distsource < 5) {
                             creep.moveTo(creep.room.controller)
                         }
@@ -119,13 +119,13 @@ var rolecarry = {
                     var target = creep.pos.findClosestByRange(targets)
                     if (target) {
                         if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo2(target);
+                            creep.moveTo2(target, {range: 1});
                         }
                         return;
                     } else if (Memory.rooms[creep.memory.home].Lager) {
                         dropptarget = Game.getObjectById(Memory.rooms[creep.memory.home].Lager)
                         if (creep.transfer(dropptarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo2(dropptarget, { reusePath: 50 })
+                            creep.moveTo2(dropptarget, { reusePath: 50, range: 1 })
                         }
                         return;
                     } else {
@@ -136,7 +136,7 @@ var rolecarry = {
                         });
                         if (xspawn) {
                             if (xspawn.length > 0) {
-                                creep.moveTo2(xspawn[0], { reusePath: 50 })
+                                creep.moveTo2(xspawn[0], { reusePath: 50, range: 1 })
                             }
                         }
                     }
@@ -147,7 +147,7 @@ var rolecarry = {
                                 creep.transfer(creep.room.terminal, res) == ERR_NOT_IN_RANGE
                             }
                         } else {
-                            creep.moveTo2(creep.room.terminal)
+                            creep.moveTo2(creep.room.terminal, {range: 1})
                         }
                         return;
                     } else if (Memory.rooms[creep.memory.home].Lager) {
@@ -157,7 +157,7 @@ var rolecarry = {
                                 creep.transfer(dropptarget, res) == ERR_NOT_IN_RANGE
                             }
                         } else {
-                            creep.moveTo2(dropptarget)
+                            creep.moveTo2(dropptarget, {range: 1})
                         }
                     }
                 }

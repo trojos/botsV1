@@ -52,7 +52,46 @@ var subroom = {
                     roomcontroll = false
                 }
             }
+            //Invasion
+            var invasion = false
+            if (Memory.rooms[room].Invasion == undefined) { Memory.rooms[room].Invasion = {} }
+            var invaders = Game.rooms[room].find(FIND_HOSTILE_CREEPS, {
+                filter: sa => sa.owner.username != 'SteveTrov'
+            })
+            if (invaders.length > 0) {
+                Memory.rooms[room].Invasion.Invasion = true
+                invasion = true
+                // var inBPheal = 0; //var inBPranged = 0; var inBPtough = 0        //Ermittlung der Heal und ranged Bodyparts der Invader, boosted = *4
+                // invaders.forEach(inv => {
+                //     var inBP = inv.body
+                //     inBP.forEach(BP => {
+                //         //if (BP.type == HEAL && BP.boost == undefined) { inBPheal += 1 } else if (BP.type == HEAL) { inBPheal += 4 }
+                //         //if (BP.type == RANGED_ATTACK && BP.boost == undefined) { inBPranged += 1 } else if (BP.type == RANGED_ATTACK) { inBPranged += 4 }
+                //         //if (BP.type == TOUGH && BP.boost == undefined) { inBPtough += 1 } else if (BP.type == TOUGH) { inBPtough += 4 }
+                //     })
+                // });
+                // //if (room == 'W2S19'){ console.log (inBPheal)}
+                // var invtype = 'verysmall'
+                // var DDneed = 0
+                // var boost = false
+                // if (inBPheal > 10) { invtype = 'small'; DDneed = 1 }
+                // if (inBPheal > 50) { invtype = 'big'; DDneed = 2; boost = true }
+                // // if (inBPheal > 45) { invtype = 'verybig'; DDneed = 3 }
+                // // if (inBPheal > 60) { invtype = 'nope'; DDneed = 0 } //keine verteidigung!!
+                // Memory.rooms[room].Invasion.type = invtype
 
+                // if (invtype == 'big') {
+                //     console.log('________________________')
+                //     console.log('Große Invasion in', room, inBPheal)
+                //     console.log('________________________')
+                // }
+
+
+            } else {
+                Memory.rooms[room].Invasion.Invasion = false
+                Memory.rooms[room].Invasion.type = ''
+                invasion = false
+            }
             // Rep und Bauzeugs in Memory schreiben
             if (insight) {
                 HomeRCL = Game.rooms[room].controller.level
@@ -120,7 +159,7 @@ var subroom = {
             //Straßen bauen
             //if (subroom == 'W7S18') {
 
-            if (Memory.rooms[subroom] == undefined) {Memory.rooms[subroom]= {}}
+            if (Memory.rooms[subroom] == undefined) { Memory.rooms[subroom] = {} }
             if (Memory.rooms[subroom].Straßenbau == undefined) { Memory.rooms[subroom].Straßenbau = {} }
             if ((Memory.rooms[subroom].Straßenbau.tick == undefined) || Memory.rooms[subroom].Straßenbau.tick < Game.time - 1499 && Memory.rooms[subroom].Straßenbau.fertig == true) {
                 Memory.rooms[subroom].Straßenbau = {}
@@ -185,7 +224,7 @@ var subroom = {
 
             //----------  Miner + Carry  ----------
             //Je Miner 2 Carrier
-            if (insight && !wait && roomcontroll) {
+            if (insight && !wait && roomcontroll && !invasion) {
                 var miningspots = Game.rooms[subroom].find(FIND_SOURCES)
                 for (var spots in miningspots) {
                     //spawn miner mit spot im memory
@@ -245,7 +284,7 @@ var subroom = {
             }
 
             //---------- bmstr Baumeister  ----------
-            if (insight && !wait) {
+            if (insight && !wait && !invasion) {
                 var BPneed = Memory.rooms[subroom].Bmstr.baubodyparts + Memory.rooms[subroom].Bmstr.reppbodyparts
                 var cmem = { role: 'bmstr', home: room, targetroom: subroom, working: false, onsite: false }
                 var ccreep = _.filter(Game.creeps, (creep) =>
@@ -274,7 +313,7 @@ var subroom = {
             }
             //----------   claim    ----------
             // && Game.rooms[subroom].controller.reservation.ticksToEnd < 4000
-            if (insight && !wait) {
+            if (insight && !wait && !invasion) {
                 var claimneed = true
                 if (roomcontroll) {
                     if (Game.rooms[subroom].controller.reservation) {
@@ -315,11 +354,14 @@ var subroom = {
             }
 
             //defence
-            if (insight) {
+            if (invasion && insight) {
                 var defender = 0
                 var hostile = Game.rooms[subroom].find(FIND_HOSTILE_CREEPS)
                 if (hostile.length > 0) {
-                    var defender = 1
+                    console.log(subroom, _.sum(hostile, function (creep) { return creep.body.length }))
+                    if (_.sum(hostile, function (creep) { return creep.body.length }) > 2) {
+                        var defender = 1
+                    }
                 }
 
                 if (defender > 0) {

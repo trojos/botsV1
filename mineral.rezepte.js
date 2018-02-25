@@ -79,7 +79,36 @@ var mineralrezepte = {
                     B: { type: 'prod', mineral: 'XGH2O', source1: 'B1', source2: 'A2' },
                     B1: { type: 'source', mineral: 'GH2O' },
                 }
-            }
+            },
+            XZHO2_XZH2O: {
+                name: 'XZHO2_XZH2O', prod: 5, rezept: {
+                    A: { type: 'prod', mineral: 'XZHO2', source1: 'A1', source2: 'A2' },
+                    A1: { type: 'source', mineral: 'ZHO2' },
+                    A2: { type: 'source', mineral: 'X' },
+                    B: { type: 'prod', mineral: 'XZH2O', source1: 'B1', source2: 'A2' },
+                    B1: { type: 'source', mineral: 'ZH2O' },
+                }
+            },
+            ZHO2: {
+                name: 'ZHO2', prod: 6, rezept: {
+                    A: { type: 'prod', mineral: 'ZO', source1: 'A1', source2: 'A2' },
+                    A1: { type: 'source', mineral: 'Z' },
+                    A2: { type: 'source', mineral: 'O' },
+                    B: { type: 'prod', mineral: 'OH', source1: 'B1', source2: 'A2' },
+                    B1: { type: 'source', mineral: 'H' },
+                    C: { type: 'prod', mineral: 'ZHO2', source1: 'A', source2: 'B' },
+                }
+            },
+            ZH2O: {
+                name: 'ZH2O', prod: 6, rezept: {
+                    A: { type: 'prod', mineral: 'ZH', source1: 'A1', source2: 'A2' },
+                    A1: { type: 'source', mineral: 'Z' },
+                    A2: { type: 'source', mineral: 'H' },
+                    B: { type: 'prod', mineral: 'OH', source1: 'B1', source2: 'A2' },
+                    B1: { type: 'source', mineral: 'O' },
+                    C: { type: 'prod', mineral: 'ZH2O', source1: 'A', source2: 'B' },
+                }
+            },
         }
 
         Memory.rezepte = rezepte

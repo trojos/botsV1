@@ -1,6 +1,6 @@
 
 var reactions = {
-    run: function (room, Auftragrezept) {
+    run: function (room, Auftragrezept, boost) {
         // ------ RAUMVARIABLEN und ABBRUCH
         if (Memory.rooms[room].Labs == undefined) {
             Memory.rooms[room].Labs = {}
@@ -17,7 +17,7 @@ var reactions = {
         var boosterprod
         var labs = Game.rooms[room].find(FIND_MY_STRUCTURES, { filter: str => str.structureType == STRUCTURE_LAB && str.isActive() })
 
-        if (labs.length < 10) {                 // Wenn weniger als 10 Labore vorhanden erfolgt keine Produktion
+        if (labs.length < 10 || Auftragrezept == 'boost') {                 // Wenn weniger als 10 Labore vorhanden erfolgt keine Produktion
             boosterprod = false
         } else {
             if (Memory.rezepte[Auftragrezept] == undefined) {
@@ -29,15 +29,23 @@ var reactions = {
             }
         }
 
-        if (!boosterprod) {
-            if (labs.length >= 1) {             // Jedoch wird ab einem Labor ein Booster bereitgestellt
-                Memory.rooms[room].Labs.Boosts.XGH2O = { type: 'XGH2O', id: labs[0].id, pos: labs[0].pos }
+        if (!boosterprod) { // Jedoch wird ab einem Labor ein Booster bereitgestellt
+            if (labs) {
+                Memory.rooms[room].Labs.Boosts = {}
+                delete Memory.rooms[room].Labs.Labs
+                delete Memory.rooms[room].Labs.BoostLabs
+                delete Memory.rooms[room].Labs.produkt
+                delete Memory.rooms[room].Labs.prod
+                for (let i = 0; i < labs.length; i++) {
+                    if (boost[i]) {
+                        Memory.rooms[room].Labs.Boosts[boost[i]] = { type: boost[i], id: labs[i].id, pos: labs[i].pos }
+                    }
+                }
             }
         }
 
         if (boosterprod) {
             // ----- LABS definieren
-            
             Memory.rooms[room].Labs.produkt = Auftragrezept
             if (rezept.prod != Memory.rooms[room].Labs.prod || 1 == 2) {  //Wenn sich die Anzahl der benötigten Labs ändert muss neu berechnet werden
                 Memory.rooms[room].Labs.Labs = {}
@@ -78,9 +86,9 @@ var reactions = {
                                 Memory.rooms[room].Labs.Labs.B1 = { type: 'B1', id: labB1.id, pos: labB1.pos }
                                 Memory.rooms[room].Labs.Labs.B2 = { type: 'B2', id: labB2.id, pos: labB2.pos }
                                 Memory.rooms[room].Labs.prod = rezept.prod
-                                Memory.rooms[room].Labs.Boosts.XGHO2 = { type: 'XGHO2', id: alllabs[0].id, pos: alllabs[0].pos }
-                                Memory.rooms[room].Labs.Boosts.XLHO2 = { type: 'XLHO2', id: alllabs[1].id, pos: alllabs[1].pos }
-                                Memory.rooms[room].Labs.Boosts.XKHO2 = { type: 'XKHO2', id: alllabs[2].id, pos: alllabs[2].pos }
+                                // Memory.rooms[room].Labs.Boosts.XGHO2 = { type: 'XGHO2', id: alllabs[0].id, pos: alllabs[0].pos }
+                                // Memory.rooms[room].Labs.Boosts.XLHO2 = { type: 'XLHO2', id: alllabs[1].id, pos: alllabs[1].pos }
+                                // Memory.rooms[room].Labs.Boosts.XKHO2 = { type: 'XKHO2', id: alllabs[2].id, pos: alllabs[2].pos }
                             }
                             startlab += 1
                         }
@@ -119,9 +127,9 @@ var reactions = {
                                 Memory.rooms[room].Labs.Labs.A2 = { type: 'A2', id: labA2.id, pos: labA2.pos }
                                 Memory.rooms[room].Labs.Labs.B1 = { type: 'B1', id: labB1.id, pos: labB1.pos }
                                 Memory.rooms[room].Labs.prod = rezept.prod
-                                Memory.rooms[room].Labs.Boosts.XGHO2 = { type: 'XGHO2', id: alllabs[0].id, pos: alllabs[0].pos }
-                                Memory.rooms[room].Labs.Boosts.XLHO2 = { type: 'XLHO2', id: alllabs[1].id, pos: alllabs[1].pos }
-                                Memory.rooms[room].Labs.Boosts.XKHO2 = { type: 'XKHO2', id: alllabs[2].id, pos: alllabs[2].pos }
+                                // Memory.rooms[room].Labs.Boosts.XGHO2 = { type: 'XGHO2', id: alllabs[0].id, pos: alllabs[0].pos }
+                                // Memory.rooms[room].Labs.Boosts.XLHO2 = { type: 'XLHO2', id: alllabs[1].id, pos: alllabs[1].pos }
+                                // Memory.rooms[room].Labs.Boosts.XKHO2 = { type: 'XKHO2', id: alllabs[2].id, pos: alllabs[2].pos }
                             }
                             startlab += 1
                         }
@@ -149,17 +157,34 @@ var reactions = {
                                 Memory.rooms[room].Labs.Labs.A2 = { type: 'A2', id: labA2.id, pos: labA2.pos }
                                 Memory.rooms[room].Labs.Labs.B1 = { type: 'B1', id: labB1.id, pos: labB1.pos }
                                 Memory.rooms[room].Labs.prod = rezept.prod
-                                Memory.rooms[room].Labs.Boosts.XGHO2 = { type: 'XGHO2', id: alllabs[0].id, pos: alllabs[0].pos }
-                                Memory.rooms[room].Labs.Boosts.XLHO2 = { type: 'XLHO2', id: alllabs[1].id, pos: alllabs[1].pos }
-                                Memory.rooms[room].Labs.Boosts.XKHO2 = { type: 'XKHO2', id: alllabs[2].id, pos: alllabs[2].pos }
-                                Memory.rooms[room].Labs.Boosts.XGHO2 = { type: 'XGHO2', id: alllabs[3].id, pos: alllabs[3].pos }
+                                // Memory.rooms[room].Labs.Boosts.XGHO2 = { type: 'XGHO2', id: alllabs[0].id, pos: alllabs[0].pos }
+                                // Memory.rooms[room].Labs.Boosts.XLHO2 = { type: 'XLHO2', id: alllabs[1].id, pos: alllabs[1].pos }
+                                // Memory.rooms[room].Labs.Boosts.XKHO2 = { type: 'XKHO2', id: alllabs[2].id, pos: alllabs[2].pos }
+                                // Memory.rooms[room].Labs.Boosts.XGHO2 = { type: 'XGHO2', id: alllabs[3].id, pos: alllabs[3].pos }
                             }
                             startlab += 1
                         }
                         break;
                 }
+                var boostlabs = []
+                alllabs.forEach(lab => {
+                    boostlabs.push({ id: lab.id, pos: lab.pos })
+                });
+                Memory.rooms[room].Labs.BoostLabs = boostlabs
             }
         }
+
+        // Boostlabore definieren
+        var boostlabs = Memory.rooms[room].Labs.BoostLabs
+        if (boostlabs && Auftragrezept != 'boost') {
+            Memory.rooms[room].Labs.Boosts = {}
+            for (let i = 0; i < boostlabs.length; i++) {
+                if (boost[i]) {
+                    Memory.rooms[room].Labs.Boosts[boost[i]] = { type: boost[i], id: boostlabs[i].id, pos: boostlabs[i].pos }
+                }
+            }
+        }
+
         // ----- LABs Liefer und Abhohlaufträge erstellen
         Memory.rooms[room].Labs.Minerals = {}
         Memory.rooms[room].Labs.Minerals.have = {}
@@ -171,27 +196,29 @@ var reactions = {
             //Produktionslabore:
             for (const labtype of Object.keys(rezept.rezept)) {
                 var lab = Game.getObjectById(Memory.rooms[room].Labs.Labs[labtype].id)
-                if (lab.mineralType == rezept.rezept[labtype].mineral || lab.mineralType == null) {  //Überprüfen ob Minerals im Lab sind die nicht hineingehören, falls ja dann Auftrag für räumen erteilen
-                    if (rezept.rezept[labtype].type == 'source') {
-                        if (lab.mineralAmount < 2000) {
-                            minneed.push({ id: lab.id, type: 'lab', res: rezept.rezept[labtype].mineral, amount: lab.mineralCapacity - lab.mineralAmount, pos: lab.pos })
-                            if (terminal.store[rezept.rezept[labtype].mineral] != undefined) {
-                                if (terminal.store[rezept.rezept[labtype].mineral] > lab.mineralCapacity - lab.mineralAmount) {
-                                    minhave.push({ id: terminal.id, type: 'terminal', res: rezept.rezept[labtype].mineral, amount: lab.mineralCapacity - lab.mineralAmount, pos: terminal.pos })
-                                } else {
-                                    minhave.push({ id: terminal.id, type: 'terminal', res: rezept.rezept[labtype].mineral, amount: terminal.store[rezept.rezept[labtype].mineral], pos: terminal.pos })
+                if (lab) {
+                    if (lab.mineralType == rezept.rezept[labtype].mineral || lab.mineralType == null) {  //Überprüfen ob Minerals im Lab sind die nicht hineingehören, falls ja dann Auftrag für räumen erteilen
+                        if (rezept.rezept[labtype].type == 'source') {
+                            if (lab.mineralAmount < 2000) {
+                                minneed.push({ id: lab.id, type: 'lab', res: rezept.rezept[labtype].mineral, amount: lab.mineralCapacity - lab.mineralAmount, pos: lab.pos })
+                                if (terminal.store[rezept.rezept[labtype].mineral] != undefined) {
+                                    if (terminal.store[rezept.rezept[labtype].mineral] > lab.mineralCapacity - lab.mineralAmount) {
+                                        minhave.push({ id: terminal.id, type: 'terminal', res: rezept.rezept[labtype].mineral, amount: lab.mineralCapacity - lab.mineralAmount, pos: terminal.pos })
+                                    } else {
+                                        minhave.push({ id: terminal.id, type: 'terminal', res: rezept.rezept[labtype].mineral, amount: terminal.store[rezept.rezept[labtype].mineral], pos: terminal.pos })
+                                    }
+                                }
+                            }
+                        } else if (rezept.rezept[labtype].type == 'prod') {
+                            if (_.sum(terminal.store) < 290000) {
+                                if (lab.mineralAmount > 500) {
+                                    minhave.push({ id: lab.id, type: 'lab', res: rezept.rezept[labtype].mineral, amount: lab.mineralAmount, pos: lab.pos })
                                 }
                             }
                         }
-                    } else if (rezept.rezept[labtype].type == 'prod') {
-                        if (_.sum(terminal.store) < 290000) {
-                            if (lab.mineralAmount > 500) {
-                                minhave.push({ id: lab.id, type: 'lab', res: rezept.rezept[labtype].mineral, amount: lab.mineralAmount, pos: lab.pos })
-                            }
-                        }
+                    } else {
+                        minhave.push({ id: lab.id, type: 'lab', res: lab.mineralType, amount: lab.mineralAmount, pos: lab.pos })
                     }
-                } else {
-                    minhave.push({ id: lab.id, type: 'lab', res: lab.mineralType, amount: lab.mineralAmount, pos: lab.pos })
                 }
             }
         }
@@ -200,23 +227,40 @@ var reactions = {
             var blabm = Memory.rooms[room].Labs.Boosts[blab]
             var blabo = Game.getObjectById(blabm.id)
             //console.log(blabo.mineralType)
-            if (blabo.mineralType == blabm.type || blabo.mineralType == null) {
-                //console.log (room,'auffüllen',blabm.type,blabo.mineralAmount)
-                if (blabo.mineralAmount < 2000) {
-                    minneed.push({ id: blabo.id, type: 'lab', res: blabm.type, amount: blabo.mineralCapacity - blabo.mineralAmount, pos: blabo.pos })
-                    if (terminal.store[blabm.type] != undefined) {
-                        if (terminal.store[blabm.type] > blabo.mineralCapacity - blabo.mineralAmount) {
-                            minhave.push({ id: terminal.id, type: 'terminal', res: blabm.type, amount: blabo.mineralCapacity - blabo.mineralAmount, pos: terminal.pos })
-                        } else {
-                            minhave.push({ id: terminal.id, type: 'terminal', res: blabm.type, amount: terminal.store[blabm.type], pos: terminal.pos })
+            if (blabo) {
+                if (blabo.mineralType == blabm.type || blabo.mineralType == null) {
+                    //console.log (room,'auffüllen',blabm.type,blabo.mineralAmount)
+                    if (blabo.mineralAmount < 2000) {
+                        minneed.push({ id: blabo.id, type: 'lab', res: blabm.type, amount: blabo.mineralCapacity - blabo.mineralAmount, pos: blabo.pos })
+                        if (terminal.store[blabm.type] != undefined) {
+                            if (terminal.store[blabm.type] > blabo.mineralCapacity - blabo.mineralAmount) {
+                                minhave.push({ id: terminal.id, type: 'terminal', res: blabm.type, amount: blabo.mineralCapacity - blabo.mineralAmount, pos: terminal.pos })
+                            } else {
+                                minhave.push({ id: terminal.id, type: 'terminal', res: blabm.type, amount: terminal.store[blabm.type], pos: terminal.pos })
+                            }
                         }
                     }
+                } else {
+                    //console.log(room,'leeren')
+                    minhave.push({ id: blabo.id, type: 'lab', res: blabo.mineralType, amount: blabo.mineralAmount, pos: blabo.pos })
                 }
-            } else {
-                //console.log(room,'leeren')
-                minhave.push({ id: blabo.id, type: 'lab', res: blabo.mineralType, amount: blabo.mineralAmount, pos: blabo.pos })
             }
         }
+        // ----- NUKER Lieferauftrag erstellen
+        var nuker = Game.rooms[room].find(FIND_MY_STRUCTURES, { filter: str => str.structureType == STRUCTURE_NUKER })
+        if (nuker.length > 0) {
+            if (nuker[0].ghodium < nuker[0].ghodiumCapacity) {
+                if (Game.rooms[room].terminal.store[RESOURCE_GHODIUM] > 0) {
+                    var gamount = nuker[0].ghodiumCapacity - nuker[0].ghodium
+                    if (gamount > Game.rooms[room].terminal.store[RESOURCE_GHODIUM]) { gamount = Game.rooms[room].terminal.store[RESOURCE_GHODIUM] }
+                    minneed.push({ id: nuker[0].id, type: 'nuker', res: RESOURCE_GHODIUM, amount: gamount, pos: nuker[0].pos })
+                    minhave.push({ id: terminal.id, type: 'terminal', res: RESOURCE_GHODIUM, amount: gamount, pos: terminal.pos })
+                }
+            }
+        }
+
+
+
         minhave.forEach(have => {
             Memory.rooms[room].Labs.Minerals.have[have.id] = have
             Memory.rooms[room].Labs.Minerals.have[have.id].Art = 'get'
@@ -275,6 +319,13 @@ var reactions = {
             Memory.rooms[room].Labs.Lager[mineral].Lagerneed = 0.8
             Memory.rooms[room].Labs.Lager[mineral].Lagerhave = 1.2
         }
+        //NUKER
+        if (nuker.length > 0) {
+            var mineral = RESOURCE_GHODIUM
+            Memory.rooms[room].Labs.Lager[mineral] = {}
+            Memory.rooms[room].Labs.Lager[mineral].Lagerneed = 0.8
+            Memory.rooms[room].Labs.Lager[mineral].Lagerhave = 1.2
+        }
 
         if (boosterprod) {
             // LAB reactions durchführen
@@ -290,12 +341,14 @@ var reactions = {
 
                     if (storeges < prodstop) {
                         var lab = Game.getObjectById(Memory.rooms[room].Labs.Labs[labtype].id)
-                        //console.log(rezept.rezept[labtype].mineral,(Memory.Empire.Minerals[rezept.rezept[labtype].mineral] && lab.mineralAmount < 2000) < 2000 , (Memory.Empire.Minerals[rezept.rezept[labtype].mineral] == undefined && lab.mineralAmount < 100))
-                        if ((Memory.Empire.Minerals[rezept.rezept[labtype].mineral] && lab.mineralAmount < 2000) || (Memory.Empire.Minerals[rezept.rezept[labtype].mineral] == undefined && lab.mineralAmount < 100)) {
-                            var lab1 = Game.getObjectById(Memory.rooms[room].Labs.Labs[rezept.rezept[labtype].source1].id)
-                            var lab2 = Game.getObjectById(Memory.rooms[room].Labs.Labs[rezept.rezept[labtype].source2].id)
-                            if (lab1.mineralType == rezept.rezept[rezept.rezept[labtype].source1].mineral && lab2.mineralType == rezept.rezept[rezept.rezept[labtype].source2].mineral) {
-                                lab.runReaction(lab1, lab2)
+                        if (lab) {
+                            //console.log(rezept.rezept[labtype].mineral,(Memory.Empire.Minerals[rezept.rezept[labtype].mineral] && lab.mineralAmount < 2000) < 2000 , (Memory.Empire.Minerals[rezept.rezept[labtype].mineral] == undefined && lab.mineralAmount < 100))
+                            if ((Memory.Empire.Minerals[rezept.rezept[labtype].mineral] && lab.mineralAmount < 2000) || (Memory.Empire.Minerals[rezept.rezept[labtype].mineral] == undefined && lab.mineralAmount < 100)) {
+                                var lab1 = Game.getObjectById(Memory.rooms[room].Labs.Labs[rezept.rezept[labtype].source1].id)
+                                var lab2 = Game.getObjectById(Memory.rooms[room].Labs.Labs[rezept.rezept[labtype].source2].id)
+                                if (lab1.mineralType == rezept.rezept[rezept.rezept[labtype].source1].mineral && lab2.mineralType == rezept.rezept[rezept.rezept[labtype].source2].mineral) {
+                                    lab.runReaction(lab1, lab2)
+                                }
                             }
                         }
                     } else {

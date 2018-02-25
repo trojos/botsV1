@@ -61,6 +61,7 @@ function avoidlair(creep, abstand) {
                 })
                 var fleepos = fleepath.path[fleepath.path.length - 1]
                 //creep.moveByPath(fleepath.path, { visualizePathStyle: { stroke: '#FA8258' } })
+                new RoomVisual(creep.room.name).circle(fleepos.x, fleepos.y, { fill: '#ff0000', radius: .5 })
                 creep.moveTo2(fleepos)
             }
         }
@@ -75,19 +76,35 @@ var roleMiner = {
 
         if (creep.room.name == creep.memory.targetroom || creep.memory.targetroom == '') {
             var sources = Game.getObjectById(creep.memory.spot)
-            var lairatSpawn = sources.pos.findInRange(FIND_HOSTILE_STRUCTURES, 5, {
-                filter: { structureType: STRUCTURE_KEEPER_LAIR }
-            })
-            if (lairatSpawn.length > 0) {
-                var tts = lairatSpawn[0].ticksToSpawn
-                if (tts < 7 || tts == undefined) {
-                    avoidlair(creep, 5)
+            // var lairatSpawn = sources.pos.findInRange(FIND_HOSTILE_STRUCTURES, 5, {
+            //     filter: { structureType: STRUCTURE_KEEPER_LAIR }
+            // })
+            // if (lairatSpawn.length > 0) {
+            //     var tts = lairatSpawn[0].ticksToSpawn
+            //     if (tts < 7 || tts == undefined) {
+            //         avoidlair(creep, 5)
+            //         var avoidl = true
+            //     } else { var avoidl = false }
+            // } else { avoidl = false }
+            var lairatSpawn = Game.getObjectById(Memory.rooms[creep.memory.targetroom].spots.spots[creep.memory.spot].lair)
+
+            if (lairatSpawn) {
+                var tts = lairatSpawn.ticksToSpawn
+                var atsource = false
+                //if (creep.pos.inRangeTo(lairatSpawn, 8)) { atsource = true }
+                var timetotts = Memory.rooms[creep.memory.targetroom].spots.spots[creep.memory.spot].fleepoint.cost
+                if (timetotts == undefined) { timetotts = 15}
+                if (timetotts > 50) {timetotts = 15}
+                if ((tts <= timetotts || tts == undefined)) {
+                    var fleepoint = new RoomPosition(Memory.rooms[creep.memory.targetroom].spots.spots[creep.memory.spot].fleepoint.x, Memory.rooms[creep.memory.targetroom].spots.spots[creep.memory.spot].fleepoint.y, Memory.rooms[creep.memory.targetroom].spots.spots[creep.memory.spot].fleepoint.roomName)
+                    creep.moveTo2(fleepoint, { reusePath: 50, ignoreCreeps: false }, true)
+                    //avoidlair(creep, 6)
                     var avoidl = true
                 } else { var avoidl = false }
             } else { avoidl = false }
 
-            if (avoidl) {
-            } else {
+
+            if (!avoidl) {
                 var avoid = avoidkeeper(creep, 4)
                 if (!avoid) {
                     var contatsource = sources.pos.findInRange(FIND_STRUCTURES, 1, {
@@ -133,7 +150,7 @@ var roleMiner = {
 
 
         } else {
-            creep.moveTo2(creep.pos.findClosestByPath(creep.room.findExitTo(creep.memory.targetroom)), { reusePath: 50 })
+            creep.moveTo2(Game.getObjectById(creep.memory.spot), { reusePath: 50 })
         }
 
     }

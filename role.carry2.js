@@ -105,13 +105,13 @@ function getcarrypush2(creep, home) {
                 }
                 Aufträge.push(Auftrag)
             } else {
-                console.log(creep.pos.roomName, creep.name)
-                if (Memory.rooms[home].Labs.Minerals == undefined){  //Wenn kein Terminal wird in Storage geliefert
+                //console.log(creep.pos.roomName, creep.name)
+                if (Memory.rooms[home].Labs.Minerals == undefined) {  //Wenn kein Terminal wird in Storage geliefert
                     Auftrag = Memory.rooms[home].energy.Lager
                 } else {
                     Auftrag = Memory.rooms[home].Labs.Minerals.Terminal
                 }
-                
+
                 Auftrag.res = carrymineral
                 Auftrag.Art = 'push'
                 Aufträge.push(Auftrag)
@@ -135,6 +135,7 @@ function getcarryget(creep, home) {
             Memory.rooms[home].energy.have[Auftrag.id].amount -= (creep.carryCapacity - _.sum(creep.carry))
         }
     } else if (_.size(mhave) > 0) {
+
         Auftrag = mhave[Object.keys[0]]
         Auftrag = _.min(mhave, s => creep.pos.getRangeTo(s.pos.x, s.pos.y))
         //console.log(home, creep.name)
@@ -144,6 +145,7 @@ function getcarryget(creep, home) {
             Memory.rooms[home].Labs.Minerals.have[Auftrag.id].amount -= (creep.carryCapacity - _.sum(creep.carry))
         }
     } else {
+        
         var eneed = Memory.rooms[home].energy.need
         if (Memory.rooms[home].Labs == undefined) { var mneed = {} } else {
             if (Memory.rooms[home].Labs.Minerals == undefined) { var mneed = {} } else { var mneed = Memory.rooms[home].Labs.Minerals.need }
@@ -203,13 +205,16 @@ var rolecarry2 = {
         }
 
         //console.log(creep.name)
+
         if (Aufträge.length == 0 || Aufträge[0].Art == 'wait') {
             if (creep.carry[RESOURCE_ENERGY] > 50) {
                 Aufträge = getcarrypush2(creep, home)
             } else if (_.sum(creep.carry) - creep.carry[RESOURCE_ENERGY] > 0) {
                 Aufträge = getcarrypush2(creep, home)
             } else {
+                
                 Aufträge = getcarryget(creep, home)
+
             }
             creep.memory.Aufträge = Aufträge
         }
@@ -227,7 +232,7 @@ var rolecarry2 = {
                 if (creep.pos.isNearTo(zielpos)) {
                     var ziel = Game.getObjectById(Aufträge[0].id)
                     var erfolg = creep.transfer(ziel, Aufträge[0].res)
-                    if (erfolg == 0 || erfolg == -8|| erfolg == -7 || erfolg == -6) {
+                    if (erfolg == 0 || erfolg == -8 || erfolg == -7 || erfolg == -6) {
                         Aufträge.splice(0, 1)
                     }
                     if (Aufträge.length < 1) {
@@ -255,7 +260,7 @@ var rolecarry2 = {
                         }
                     } else {
                         var erfolg = creep.withdraw(ziel, Aufträge[0].res)
-                        if (erfolg == 0 || erfolg == -6) {
+                        if (erfolg == 0 || erfolg == -6 || erfolg == -10) {
                             Aufträge.splice(0, 1)
                             creep.memory.Aufträge = Aufträge
                         }

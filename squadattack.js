@@ -10,7 +10,7 @@ function createSammelpunkt(SPorigin, SPdest, targetroom) {
     var AngriffPath = SammelPath.path.slice()
     _.remove(SammelPath.path, 'roomName', targetroom)  //Entfernt die Path Positionen im Targetroom damit der Sammelpunkt im vorherigen Raum liegt
     Memory.Attack[targetroom].Sammelpunkt = SammelPath.path[SammelPath.path.length - 5]  //Der Fünftletze Path Punkt ist der Sammelpunkt
-    Memory.Attack[targetroom].SammelPath = SammelPath
+    //Memory.Attack[targetroom].SammelPath = SammelPath
     _.remove(AngriffPath, function (pa) {
         return pa.roomName != targetroom
     })
@@ -61,7 +61,9 @@ var squadattack = {
         }
 
         if (insight) {  // Target definieren damit alle das selbe Ziel angreifen
-            var hostilecreeps = tarroom.find(FIND_HOSTILE_CREEPS)
+            var hostilecreeps = tarroom.find(FIND_HOSTILE_CREEPS, {
+                filter: sa => sa.owner.username != 'SteveTrov'
+            })
             var hcNdd = _.filter(hostilecreeps, function (object) { return object.getActiveBodyparts(ATTACK) != 0; })
             var hcFdd = _.filter(hostilecreeps, function (object) { return object.getActiveBodyparts(RANGED_ATTACK) != 0; })
             var hcHeal = _.filter(hostilecreeps, function (object) { return object.getActiveBodyparts(HEAL) != 0; })
@@ -72,7 +74,7 @@ var squadattack = {
                 var spot = new RoomPosition(flag[0].pos.x, flag[0].pos.y, flag[0].pos.roomName)
                 var iswall = spot.findInRange(FIND_STRUCTURES, 0, {   //Wenn mit der Flagge eine Wall oder Rampart markiert ist, ist das das Ziel
                     filter: stru => stru.structureType == STRUCTURE_WALL || stru.structureType == STRUCTURE_RAMPART
-                        || stru.structureType == STRUCTURE_EXTENSION|| stru.structureType == STRUCTURE_STORAGE
+                        || stru.structureType == STRUCTURE_EXTENSION || stru.structureType == STRUCTURE_STORAGE
                         || stru.structureType == STRUCTURE_SPAWN
                 })
                 if (iswall.length > 0) {
@@ -113,10 +115,10 @@ var squadattack = {
                     var target = spot.findClosestByRange(hsstore)
                 }
             }
-
             if (!target) {                                          //Wenn noch immer kein Target dann restliche creeps
                 var target = spot.findClosestByRange(hostilecreeps)
             }
+
             if (!target) {                                          //Wenn keine Creeps mehr vorhanden dann die restlichen structures
                 var target = spot.findClosestByRange(strucs)
             }
@@ -192,26 +194,41 @@ var squadattack = {
 
             //Creeps zum Sammelpunkt schicken
             const erp = new RoomPosition(Memory.Attack[targetroom].Sammelpunkt.x, Memory.Attack[targetroom].Sammelpunkt.y, Memory.Attack[targetroom].Sammelpunkt.roomName)
-
+            new RoomVisual(erp.roomName).circle(erp.x, erp.y, { fill: '#df0000', radius: .5, opacity: 1 });
             for (var i in arAlle) {
-                if (targetroom == 'W7S18') {
-                     arAlle[i].memory.role = 'destruct'
-                     //arAlle[i].memory.status = 'attack'
+                if (targetroom == 'W2S23') {
+                    //arAlle[i].memory.role = 'wait'
+                    //arAlle[i].memory.status = 'attack'
                 }
                 if (arAlle[i].memory.status == 'wait') {
                     var creep = arAlle[i];
                     //Boost hohlen
-                    if (boost) {
+                    if (boost == 'standart') {
                         if (creep.memory.role == 'Heiler') {
-                            creepboost.run(creep, creep.memory.home, HEAL, 'XLHO2', 20)
+                            var cboost = [{ BP: HEAL, mineral: 'XLHO2', max: 20 }]
+                            creepboost.run(creep, creep.memory.home, cboost)
                         }
                         if (creep.memory.role == 'FernDD') {
-                            creepboost.run(creep, creep.memory.home, RANGED_ATTACK, 'XKHO2', 25)
+                            var cboost = [{ BP: RANGED_ATTACK, mineral: 'XKHO2', max: 25 }]
+                            creepboost.run(creep, creep.memory.home, cboost)
                         }
                         if (creep.memory.role == 'Dismantler') {
-                            creepboost.run(creep, creep.memory.home, WORK, 'XZH2O', 25)
+                            var cboost = [{ BP: WORK, mineral: 'XZH2O', max: 25 }]
+                            creepboost.run(creep, creep.memory.home, cboost)
                         }
-                        //if (creep.memory.boosted == 'goto') {console.log('gpto'); return; }  //Wenn Boost ausgeführt wird, wird abgebrochen bis boost fertig
+                    } else if (boost == 'full') {
+                        if (creep.memory.role == 'Heiler') {
+                            var cboost = [{ BP: HEAL, mineral: 'XLHO2', max: 25 }, { BP: TOUGH, mineral: 'XGHO2', max: 13 }]
+                            creepboost.run(creep, creep.memory.home, cboost)
+                        }
+                        if (creep.memory.role == 'FernDD') {
+                            var cboost = [{ BP: RANGED_ATTACK, mineral: 'XKHO2', max: 25 }, { BP: TOUGH, mineral: 'XGHO2', max: 13 }]
+                            creepboost.run(creep, creep.memory.home, cboost)
+                        }
+                        if (creep.memory.role == 'Dismantler') {
+                            var cboost = [{ BP: WORK, mineral: 'XZH2O', max: 25 }, { BP: TOUGH, mineral: 'XGHO2', max: 13 }]
+                            creepboost.run(creep, creep.memory.home, cboost)
+                        }
                     }
                     if (creep.memory.boosted == 'goto') { } else {
                         if (!creep.pos.inRangeTo(erp, 2)) {
@@ -231,22 +248,22 @@ var squadattack = {
             } else {
                 //NahDD
                 var spNahDD = erp.findInRange(FIND_MY_CREEPS, 4, {
-                    filter: nd => nd.memory.role == "NahDD"
+                    filter: nd => nd.memory.role == "NahDD" && nd.memory.targetroom == targetroom
                 })
                 var azNahDD = spNahDD.length + arNahDDattack.length
                 //FernDD
                 var spFernDD = erp.findInRange(FIND_MY_CREEPS, 4, {
-                    filter: nd => nd.memory.role == "FernDD"
+                    filter: nd => nd.memory.role == "FernDD" && nd.memory.targetroom == targetroom
                 })
                 var azFernDD = spFernDD.length + arFernDDattack.length
                 //Heiler
                 var spHeiler = erp.findInRange(FIND_MY_CREEPS, 4, {
-                    filter: nd => nd.memory.role == "Heiler"
+                    filter: nd => nd.memory.role == "Heiler" && nd.memory.targetroom == targetroom
                 })
                 var azHeiler = spHeiler.length + arHeilerattack.length
                 //Dismantler
                 var spDismantler = erp.findInRange(FIND_MY_CREEPS, 4, {
-                    filter: nd => nd.memory.role == "Dismantler"
+                    filter: nd => nd.memory.role == "Dismantler" && nd.memory.targetroom == targetroom
                 })
                 var azDismantler = spDismantler.length + arDismantlerattack.length
             }
@@ -262,7 +279,7 @@ var squadattack = {
                     var fcNahDD = NahDD; var fcFernDD = FernDD; var fcHeiler = Heiler; var fcDismantler = Dismantler
                 } else {
                     //sammeln:
-                    var mcNahDD = NahDD; var mcFernDD = FernDD - 1; var mcHeiler = Heiler; var mcDismantler = Dismantler //<--- Normaler Angriff
+                    var mcNahDD = NahDD; var mcFernDD = FernDD; var mcHeiler = Heiler; var mcDismantler = Dismantler //<--- Normaler Angriff
                     //im Kampf:
                     var fcNahDD = NahDD + 2; var fcFernDD = FernDD + 2; var fcHeiler = Heiler + 2; var fcDismantler = Dismantler + 1
                 }
@@ -304,7 +321,7 @@ var squadattack = {
 
             for (var l in arAlle) {                                     //Ausführen der Rollen
                 var creepat = arAlle[l]
-                if (creepat.memory.status == 'attack') {
+                if (creepat.memory.boosted != 'goto') {
                     if (creepat.memory.role == 'NahDD' || creepat.memory.role == 'FernDD') {
                         roleNahDD.run(creepat)
                     }
@@ -313,10 +330,6 @@ var squadattack = {
                     }
                     if (creepat.memory.role == 'Dismantler') {
                         roleDismantler.run(creepat)
-                    }
-                } else {
-                    if (creepat.memory.role == 'Heiler') {
-                        roleHeiler.run(creepat)
                     }
                 }
             }

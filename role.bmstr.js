@@ -1,3 +1,24 @@
+function isstandon(creep, movetarget) {
+    if (movetarget == undefined) {
+        movetarget = creep.room.controller.pos
+    }
+    var standon = creep.pos.findInRange(FIND_STRUCTURES, 0, {       // Wenn Creep minert wird geprüft ob creep auf container steht
+        filter: stru => stru.structureType == STRUCTURE_CONTAINER || stru.structureType == STRUCTURE_RAMPART
+    })
+    if (!standon) {
+        var standon = creep.pos.findInRange(FIND_CONSTRUCTION_SITES, 0, {       // Wenn kein Container dann Constructionsite für container
+            filter: stru => stru.structureType == STRUCTURE_CONTAINER
+        })
+    }
+    if (standon.length > 0) {
+        //creep.outputlog()
+        creep.moveTo(movetarget, { reusePath: 1 })                 // wenn ja, bewegt er sich richtung controller damit platz für miner frei ist
+        return true
+    } else {
+        return false
+    }
+}
+
 function findwork(creep) {
     var worksite
     //------- KRITTTARGETS -------
@@ -143,6 +164,7 @@ var roleBmstr = {
                                 delete creep.memory.onsitetargets
                             }
                         }
+                        isstandon(creep)
                         //console.log(creep.name, Game.cpu.getUsed() - CPUvor)
                     } else {
                         //delete creep.memory.worksite
@@ -154,18 +176,6 @@ var roleBmstr = {
                             if (creep.memory.worksite.tick <= Game.time - 10) {
                                 creep.memory.worksite = findwork(creep)
                             }
-                            var standon = creep.pos.findInRange(FIND_STRUCTURES, 0, {       // Wenn Creep minert wird geprüft ob creep auf container steht
-                                filter: stru => stru.structureType == STRUCTURE_CONTAINER
-                            })
-                            if (!standon) {
-                                var standon = creep.pos.findInRange(FIND_CONSTRUCTION_SITES, 0, {       // Wenn kein Container dann Constructionsite für container
-                                    filter: stru => stru.structureType == STRUCTURE_CONTAINER
-
-                                })
-                            }
-                            if (standon.length > 0) {
-                                creep.moveTo2(creep.room.controller.pos, { reusePath: 1 })                 // wenn ja, bewegt er sich richtung controller damit platz für miner frei ist
-                            }
                         }
 
                         if (creep.memory.worksite.type == 'build') {
@@ -174,6 +184,7 @@ var roleBmstr = {
                             if (creep.pos.getRangeTo(worksitepos) <= 3) {
                                 target = Game.getObjectById(worksite.site)
                                 if (target) { creep.build(target) } else { creep.memory.worksite = findwork(creep) }
+                                isstandon(creep, worksitepos)
                             } else {
                                 creep.moveTo2(worksitepos)
                             }
@@ -197,7 +208,10 @@ var roleBmstr = {
                                 }
                             }
                         }
+
+
                     }
+
                 }
             } else {
                 //-------- DISMANTLE --------

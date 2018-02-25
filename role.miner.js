@@ -36,7 +36,8 @@ var roleMiner = {
                         creep.moveTo2(spot, { reusePath: 50 });
                     }
                 } else {
-                    creep.moveTo2(creep.pos.findClosestByRange(creep.room.findExitTo(targetroom)))
+                    //creep.moveTo2(creep.pos.findClosestByRange(creep.room.findExitTo(targetroom)))
+                    creep.moveTo2(Game.getObjectById(spot))
                 }
             } else {
 

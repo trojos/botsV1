@@ -28,6 +28,7 @@ var prototypescreep = require('prototypes.creep')
 //var importlayout = require('build.layouts')
 var exportlayout = require('build.exportlayout')
 
+
 module.exports.loop = function () {
     if (Game.time > Memory.succesfulltick + 10) {
         Game.notify('Error in Codeausführung')
@@ -38,9 +39,12 @@ module.exports.loop = function () {
     console.log('Init Main ' + Memory.stats['CPU.maininit'])
 
     prototypescreep.run()
+
     mineralrezepte.run()
     //importlayout.run()
-    //exportlayout.run('W8S16')
+    //exportlayout.run('W4S17')
+
+    //console.log(PRODUCTS.OH[1])
 
     // Text für Controller.sign 
     Memory.signtext = "Hallo"
@@ -53,25 +57,29 @@ module.exports.loop = function () {
         }
     }
 
-    if (Game.time % 1 === 0) {
+    if (Game.time % 1500 === 0) {
 
     }
 
     // REACTIONS ausführen   -- vor Räume damit in RaumInit die Carry Auftrage berücksichtigt und bearbeitet werden können
-    // Rezepte: G, LHO2, KHO2, GHO2, GH2O, XLHO2_XKHO2, XGH2O_XGHO2, ZweixXGH2O
+    // Rezepte: G, LHO2, KHO2, GHO2, GH2O, XLHO2_XKHO2, XGH2O_XGHO2, ZweixXGH2O, XZHO2_XZH2O, ZHO2, ZH2O, boost ---> Alle Labs stehen für Boosts zur Verfügung
+    // Boosts: bei G 3, Zwischenprodukte 3, Endprodukte 5 möglich -- 
+    // XLHO2 - Heal / XKHO2 - Range / XZH2O - dismantle / XGHO2 - tough / XGH2O - Upgrade 
     if (1 == 1) {
         var reactionsvor = Game.cpu.getUsed()
-        reactions.run('W2S18', 'G')
-        reactions.run('W2S19', 'GH2O')
-        reactions.run('W7S15', 'GH2O')
-        reactions.run('W7S17', 'LHO2');
-        reactions.run('W4S17', 'G')
-        reactions.run('W3S18', 'GH2O');
-        reactions.run('W1S17', 'ZweixXGH2O')
-        reactions.run('W8S16', 'G')
-        reactions.run('W6S18', 'G')
-        reactions.run('W7S19', 'G')
-        reactions.run('W7S14', 'G')
+        reactions.run('W1S17', 'ZweixXGH2O', ['XLHO2', 'XKHO2', 'XGH2O'])
+        reactions.run('W2S18', 'G', ['XLHO2', 'XKHO2', 'XGHO2'])
+        reactions.run('W2S19', 'GH2O', ['XLHO2', 'XKHO2', 'XZH2O', 'XGHO2'])
+        reactions.run('W3S18', 'G', ['XLHO2', 'XKHO2', 'XZH2O']);
+        reactions.run('W4S17', 'GH2O', ['XLHO2', 'XKHO2', 'XGH2O'])
+        reactions.run('W6S18', 'GH2O', ['XGH2O', 'XLHO2', 'XKHO2'])
+        reactions.run('W7S15', 'XZHO2_XZH2O', ['XLHO2', 'XKHO2', 'XGHO2'])
+        reactions.run('W7S17', 'ZHO2', ['XLHO2', 'XKHO2', 'XGHO2']);
+        reactions.run('W8S16', 'ZH2O', ['XLHO2', 'XKHO2', 'XGHO2'])
+
+        reactions.run('W7S19', 'boost', ['XGH2O', 'XLHO2', 'XKHO2'])
+        reactions.run('W7S14', 'boost', ['XGH2O', 'XLHO2', 'XKHO2'])
+
         //('reaction CPU: ' + (Game.cpu.getUsed() - reactionsvor))
     }
 
@@ -86,7 +94,7 @@ module.exports.loop = function () {
     //{ targetroom: 'W8S16', todo: 'claim' },
     //{ targetroom: 'W8S16', todo: 'bmstr' },
     // Anzahl der Creeps in attack ist die GESAMTANZAHL der Creeps die angreifen sollen, auch wenn Angriff von mehreren Räumen gestartet wird
-    //{ targetroom: 'W5S18', todo: 'attack', type: 1, NahDD: 2, FernDD: 2, Heiler: 2, Dismantler: 0, attackcontroller: false, boost: true},
+    //{ targetroom: 'W5S18', todo: 'attack', type: 1, NahDD: 2, FernDD: 2, Heiler: 2, Dismantler: 0, attackcontroller: false, boost: false || 'standart' || 'full'},
     empireroom.run('W2S18', [
         { targetroom: 'W1S18', todo: 'harvest' },
     ])
@@ -94,6 +102,8 @@ module.exports.loop = function () {
         { targetroom: 'W3S19', todo: 'harvest' },
         { targetroom: 'W1S19', todo: 'harvest' },
         //{ targetroom: 'W6S18', todo: 'claim' },
+        //{ targetroom: 'W5S23', todo: 'attack', type: 1, NahDD: 0, FernDD: 0, Heiler: 0, Dismantler: 0, attackcontroller: false, boost: 'full' },
+        //{ targetroom: 'W2S22', todo: 'attack', type: 1, NahDD: 0, FernDD: 1, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
     ])
     empireroom.run('W1S17', [
         { targetroom: 'W1S16', todo: 'harvest' },
@@ -104,8 +114,7 @@ module.exports.loop = function () {
         { targetroom: 'W3S17', todo: 'harvest' },
         { targetroom: 'W5S17', todo: 'harvest' },
         { targetroom: 'W4S16', todo: 'keeper' },
-        //{ targetroom: 'W6S19', todo: 'attack', type: 1, NahDD: 0, FernDD: 2, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
-        //{ targetroom: 'W7S19', todo: 'claim' },
+        { targetroom: 'W5S16', todo: 'keeper' },
     ])
     empireroom.run('W7S17', [
         { targetroom: 'W6S17', todo: 'harvest' },
@@ -115,14 +124,12 @@ module.exports.loop = function () {
     empireroom.run('W3S18', [
         { targetroom: 'W4S18', todo: 'harvest' },
         { targetroom: 'W4S19', todo: 'harvest' },
-        //{ targetroom: 'W7S19', todo: 'claim' },
+        //{ targetroom: 'W5S22', todo: 'attack', type: 1, NahDD: 0, FernDD: 2, Heiler: 2, Dismantler: 0, attackcontroller: false, boost: false },
     ])
     empireroom.run('W7S15', [
         { targetroom: 'W8S15', todo: 'harvest' },
         { targetroom: 'W6S15', todo: 'keeper' },
         { targetroom: 'W5S15', todo: 'keeper' },
-        //{ targetroom: 'W7S14', todo: 'attack', type: 1, NahDD: 0, FernDD: 1, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
-        //{ targetroom: 'W7S14', todo: 'claim' },
     ])
     empireroom.run('W8S16', [
         { targetroom: 'W9S17', todo: 'harvest' },
@@ -132,15 +139,17 @@ module.exports.loop = function () {
         { targetroom: 'W5S18', todo: 'harvest' },
         { targetroom: 'W7S18', todo: 'harvest' },
         { targetroom: 'W5S19', todo: 'harvest' },
-        //{ targetroom: 'W7S19', todo: 'claim' },
-        //{ targetroom: 'W6S19', todo: 'bmstr' },
     ])
     empireroom.run('W7S19', [
         { targetroom: 'W6S19', todo: 'harvest' },
+        //{ targetroom: 'W7S23', todo: 'attack', type: 1, NahDD: 0, FernDD: 2, Heiler: 2, Dismantler: 0, attackcontroller: false, boost: false },
     ])
     empireroom.run('W7S14', [
         { targetroom: 'W8S14', todo: 'harvest' },
-        //{ targetroom: 'W7S18', todo: 'harvest' },
+        { targetroom: 'W7S13', todo: 'attack', type: 1, NahDD: 0, FernDD: 1, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
+        { targetroom: 'W6S13', todo: 'attack', type: 1, NahDD: 0, FernDD: 1, Heiler: 1, Dismantler: 0, attackcontroller: false, boost: false },
+        { targetroom: 'W7S13', todo: 'harvest' },
+        { targetroom: 'W6S14', todo: 'keeper' },
     ])
 
     // ------------- SQUADATTACK Ausführen von squadattack
@@ -207,6 +216,70 @@ module.exports.loop = function () {
             }
         })
     }
+
+    if (Durchschnitt < 150000) {
+        console.log('---ENERGIE KAUFEN---')
+        var maxpreis = 0.30
+
+        var MinGesamtbuy = 150000 * AllEnergyRooms.length - GesamteEnergie
+        var myorders = _.filter(Game.market.orders, { type: ORDER_BUY, resourceType: RESOURCE_ENERGY })
+        if (myorders) {
+            MinGesamtbuy -= _.sum(myorders, 'remainingAmount')
+        }
+        if (MinGesamtbuy > 0) {
+            MinGesamtbuy += 50000
+            var MinGesamtmin = _.min(NeedEnergyrooms, 'store').room
+            if (MinGesamtmin == undefined) {    //Wenn in keinen Raum etwas ist dann wäre undefined, daher einfach beim ersten im Array
+                MinGesamtmin = AllEnergyRooms[0]
+            }
+            //console.log(JSON.stringify(MinGesamtmin))
+            if (1 == 1) {
+                var sellorders = Game.market.getAllOrders(order => order.type == ORDER_SELL && order.resourceType == RESOURCE_ENERGY && order.remainingAmount > 100 && order.price <= maxpreis)
+                var buyorders = Game.market.getAllOrders(order => order.type == ORDER_BUY && order.resourceType == RESOURCE_ENERGY && order.remainingAmount > 100)
+                buyorders = _.sortByOrder(buyorders, 'price', 'desc')
+                sellorders = _.sortByOrder(sellorders, 'price', 'asc')
+                if (buyorders.length < 1) {         // Wenn keine Buyorders vorhanden sind wird eine Dummy Order erstellte. Wenn die Sellorder unter dem Preis liegt dann wird gekauft, ansonsten eine neue Buyorder mit dem Preis erstellt
+                    var buyorders = []
+                    buyorders[0] = { price: maxpreis }
+                }
+                if (sellorders.length < 1) {        // Wenn keine Sellorder dann ähnlich wie oben!
+                    var sellorders = []
+                    sellorders[0] = { price: 100 }
+                }
+                if (buyorders.length > 0 && sellorders.length > 0) {
+                    if (buyorders[0].price + 0.002 > sellorders[0].price) {  //Wenn Sellorder.price kleiner dann direkt kaufen
+                        var tradeamount
+                        if (sellorders[0].remainingAmount < MinGesamtbuy + 5000) { tradeamount = sellorders[0].remainingAmount } else { tradeamount = MinGesamtbuy + 5000 }
+                        if (tradeamount > 30000) { tradeamount = 30000 }
+                        ant = Game.market.deal(sellorders[0].id, tradeamount, MinGesamtmin)
+                        //ant = 0
+                        if (ant == 0) {
+                            console.log(MinGesamtmin + ' kaufte ' + RESOURCE_ENERGY + ' um ' + sellorders[0].price)
+                        } else {
+                            console.log('Fehler beim Kaufen in ' + MinGesamtmin + ' Code: ' + ant)
+                        }
+                    } else {
+                        var tradeprice = buyorders[0].price + 0.002
+                        ant = Game.market.createOrder(ORDER_BUY, RESOURCE_ENERGY, tradeprice, MinGesamtbuy + 5000, MinGesamtmin)
+                        //ant = 0
+                        if (ant == 0) {
+                            console.log(MinGesamtmin + ' erstelle Buy Order für  ' + RESOURCE_ENERGY + ' um ' + tradeprice)
+                        } else {
+                            console.log('Fehler beim erstellen einer BuyOrder in ' + MinGesamtmin + ' Code: ' + ant)
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+    //händisch energie kaufen
+    if (1 == 2) {
+        console.log(Game.market.calcTransactionCost(80000, 'W8S16', 'W26N7'))
+        console.log(Game.market.deal('5a3400b8709df40c12a31d08', 10866, 'W4S17'))
+    }
+
+
     Memory.stats['stored.energy.gesamt'] = GesamteEnergie
     Memory.stats['stored.energy.rooms'] = AllEnergyRooms.length
     Memory.stats['stored.energy.durchschnitt'] = Durchschnitt
@@ -218,9 +291,9 @@ module.exports.loop = function () {
     var MinCPUvor = Game.cpu.getUsed()
     var Ausgangsmaterial = { H: 10000, O: 10000, X: 5000, Z: 5000, K: 5000, U: 5000, L: 5000 }
     var AMthresholds = { sell: 2, buy: 1, Lagerneed: 1, Lagerhave: 1.5 }
-    var Zwischenprodukte = { G: 5000, LHO2: 5000, KHO2: 5000, GH2O: 5000, GHO2: 5000 }
+    var Zwischenprodukte = { G: 5000, LHO2: 5000, KHO2: 5000, GH2O: 5000, GHO2: 5000, ZHO2: 5000 , ZH2O: 5000  }
     var ZPthresholds = { Lagerneed: 1, Lagerhave: 1.1 }
-    var Endprodukte = { XLHO2: 10000, XKHO2: 10000, XGH2O: 5000, XGHO2: 10000, XZH2O: 5000 }
+    var Endprodukte = { XLHO2: 10000, XKHO2: 10000, XGH2O: 5000, XGHO2: 10000, XZH2O: 5000, XUH2O: 5000, XZHO2: 5000 }
     var EPthresholds = { Lagerneed: 0.8, Lagerhave: 1.2 }
     var AlleProdukte = {}
     Object.assign(AlleProdukte, Ausgangsmaterial, Zwischenprodukte, Endprodukte)
@@ -355,7 +428,7 @@ module.exports.loop = function () {
         }
     }
     //Endprodukte kaufen
-    var buyEnd = { XLHO2: 10000, XKHO2: 10000, XZH2O: 10000 }
+    var buyEnd = { XLHO2: 10000, XKHO2: 10000, XZH2O: 10000, XUH2O: 10000, XZHO2: 10000 }
     for (const mineral in buyEnd) {
         //if (MinGesamt[mineral] == undefined ){ MinGesamt[mineral] = 0}
         //console.log(mineral, MinGesamt[mineral], buyEnd[mineral])
@@ -402,6 +475,7 @@ module.exports.loop = function () {
                                 console.log(MinGesamtmin + ' erstelle Buy Order für  ' + mineral + ' um ' + tradeprice)
                             } else {
                                 console.log('Fehler beim erstellen einer BuyOrder in ' + MinGesamtmin + ' Code: ' + ant)
+                                console.log(ORDER_BUY, mineral, tradeprice, MinGesamtbuy + 5000, MinGesamtmin)
                             }
                         }
                     }
@@ -411,6 +485,8 @@ module.exports.loop = function () {
 
 
     }
+
+
 
     var myorders = _.filter(Game.market.orders)
     if (_.size(myorders) > 0) {
@@ -651,100 +727,122 @@ module.exports.loop = function () {
     //     }
     // }
     var creepsanzahl = 0
+    var spawningcreeps = 0
     for (var name in Game.creeps) {
         creepsanzahl += 1
         var creep = Game.creeps[name];
-        var ccpuvor = Game.cpu.getUsed()
-        if (creep.memory.role == 'carry2') {
-            rolecarry2.run(creep);
-            Memory.stats['CPU.role.carry2'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.carry2'] += 1
-        } else if (creep.memory.role == 'carry') {
-            rolecarry.run(creep);
-            Memory.stats['CPU.role.carry'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.carry'] += 1
-        } else if (creep.memory.role == 'miner') {
-            roleMiner.run(creep);
-            Memory.stats['CPU.role.miner'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.miner'] += 1
-        } else if (creep.memory.role == 'bmstr') {
-            roleBmstr.run(creep);
-            Memory.stats['CPU.role.bmstr'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.bmstr'] += 1
-        } else if (creep.memory.role == 'upgrader') {
-            roleUpgrader.run(creep);
-            Memory.stats['CPU.role.upgrader'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.upgrader'] += 1
-        } else if (creep.memory.role == 'upgraderstorage') {
-            roleUpgraderStorage.run(creep)
-            Memory.stats['CPU.role.upgraderstorage'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.upgraderstorage'] += 1
-        } else if (creep.memory.role == 'scout') {
-            rolescout.run(creep)
-            Memory.stats['CPU.role.scout'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.scout'] += 1
-        } else if (creep.memory.role == 'claim') {
-            roleClaim.run(creep);
-            Memory.stats['CPU.role.claim'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.claim'] += 1
-        } else if (creep.memory.role == 'min_harv') {
-            roleMinHarv.run(creep);
-            Memory.stats['CPU.role.min_harv'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.min_harv'] += 1
-        } else if (creep.memory.role == 'keeperscout') {
-            rolekeeperscout.run(creep);
-            Memory.stats['CPU.role.keeperscout'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.keeperscout'] += 1
-        } else if (creep.memory.role == 'keeperheal') {
-            rolekeeperHeal.run(creep);
-            Memory.stats['CPU.role.keeperheal'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.keeperheal'] += 1
-        } else if (creep.memory.role == 'keeperFernDD') {
-            rolekeeperFernDD.run(creep);
-            Memory.stats['CPU.role.keeperFernDD'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.keeperFernDD'] += 1
-        } else if (creep.memory.role == 'keeper_carry') {
-            rolekeepercarry.run(creep);
-            Memory.stats['CPU.role.keeper_carry'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.keeper_carry'] += 1
-        } else if (creep.memory.role == 'keeperbmstr') {
-            rolekeeperbmstr.run(creep);
-            Memory.stats['CPU.role.keeperbmstr'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.keeperbmstr'] += 1
-        } else if (creep.memory.role == 'keeper_miner') {
-            rolekeeperminer.run(creep);
-            Memory.stats['CPU.role.keeper_miner'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.keeper_miner'] += 1
-        } else if (creep.memory.role == 'keeper_NahDD') {
-            rolekeeperNahDD.run(creep);
-            Memory.stats['CPU.role.keeper_NahDD'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.keeper_NahDD'] += 1
-        } else if (creep.memory.role == 'keeper_MinHarv') {
-            rolekeeperMinHarv.run(creep);
-            Memory.stats['CPU.role.keeper_MinHarv'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.keeper_MinHarv'] += 1
-        } else if (creep.memory.role == 'defend') {
-            roledefend.run(creep);
-            Memory.stats['CPU.role.defend'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.defend'] += 1
-        } else if (creep.memory.role == 'destruct') {
-            roledestruct.run(creep);
-            Memory.stats['CPU.role.destruct'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.destruct'] += 1
-        } else if (creep.memory.role == 'looter') {
-            rolelooter.run(creep);
-            Memory.stats['CPU.role.looter'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.looter'] += 1
-        } else if (creep.memory.role == 'deliver') {
-            roledeliver.run(creep);
-            Memory.stats['CPU.role.deliver'] += Game.cpu.getUsed() - ccpuvor
-            Memory.stats['creeps.role.deliver'] += 1
+        if (creep.ticksToLive == undefined) {
+            spawningcreeps += 1
+        } else {
+            var ccpuvor = Game.cpu.getUsed()
+            if (creep.memory.role == 'carry2') {
+                if (Game.time % 1500 == 0) {
+                    if (creep.body.length < 18) {
+                        console.log('kleiner carry2')
+                        creep.memory.role = 'destruct'
+                    }
+                }
+                rolecarry2.run(creep);
+                Memory.stats['CPU.role.carry2'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.carry2'] += 1
+            } else if (creep.memory.role == 'carry') {
+                if (Game.time % 3000 == 0) {
+                    if (creep.body.length < 15) {
+                        console.log('kleiner carry')
+                        creep.memory.role = 'destruct'
+                    }
+                }
+                rolecarry.run(creep);
+                Memory.stats['CPU.role.carry'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.carry'] += 1
+            } else if (creep.memory.role == 'miner') {
+                roleMiner.run(creep);
+                Memory.stats['CPU.role.miner'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.miner'] += 1
+            } else if (creep.memory.role == 'bmstr') {
+                roleBmstr.run(creep);
+                Memory.stats['CPU.role.bmstr'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.bmstr'] += 1
+            } else if (creep.memory.role == 'upgrader') {
+                roleUpgrader.run(creep);
+                Memory.stats['CPU.role.upgrader'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.upgrader'] += 1
+            } else if (creep.memory.role == 'upgraderstorage') {
+                roleUpgraderStorage.run(creep)
+                Memory.stats['CPU.role.upgraderstorage'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.upgraderstorage'] += 1
+            } else if (creep.memory.role == 'scout') {
+                rolescout.run(creep)
+                Memory.stats['CPU.role.scout'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.scout'] += 1
+            } else if (creep.memory.role == 'claim') {
+                roleClaim.run(creep);
+                Memory.stats['CPU.role.claim'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.claim'] += 1
+            } else if (creep.memory.role == 'min_harv') {
+                roleMinHarv.run(creep);
+                Memory.stats['CPU.role.min_harv'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.min_harv'] += 1
+            } else if (creep.memory.role == 'keeperscout') {
+                rolekeeperscout.run(creep);
+                Memory.stats['CPU.role.keeperscout'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.keeperscout'] += 1
+            } else if (creep.memory.role == 'keeperheal') {
+                rolekeeperHeal.run(creep);
+                Memory.stats['CPU.role.keeperheal'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.keeperheal'] += 1
+            } else if (creep.memory.role == 'keeperFernDD') {
+                rolekeeperFernDD.run(creep);
+                Memory.stats['CPU.role.keeperFernDD'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.keeperFernDD'] += 1
+            } else if (creep.memory.role == 'keeper_carry') {
+                if (Game.time % 1500 == 0) {
+                    if (creep.body.length < 15) {
+                        console.log('keeper_carry')
+                        creep.memory.role = 'destruct'
+                    }
+                }
+                rolekeepercarry.run(creep);
+                Memory.stats['CPU.role.keeper_carry'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.keeper_carry'] += 1
+            } else if (creep.memory.role == 'keeperbmstr') {
+                rolekeeperbmstr.run(creep);
+                Memory.stats['CPU.role.keeperbmstr'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.keeperbmstr'] += 1
+            } else if (creep.memory.role == 'keeper_miner') {
+                rolekeeperminer.run(creep);
+                Memory.stats['CPU.role.keeper_miner'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.keeper_miner'] += 1
+            } else if (creep.memory.role == 'keeper_NahDD') {
+                rolekeeperNahDD.run(creep);
+                Memory.stats['CPU.role.keeper_NahDD'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.keeper_NahDD'] += 1
+            } else if (creep.memory.role == 'keeper_MinHarv') {
+                rolekeeperMinHarv.run(creep);
+                Memory.stats['CPU.role.keeper_MinHarv'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.keeper_MinHarv'] += 1
+            } else if (creep.memory.role == 'defend') {
+                roledefend.run(creep);
+                Memory.stats['CPU.role.defend'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.defend'] += 1
+            } else if (creep.memory.role == 'destruct') {
+                roledestruct.run(creep);
+                Memory.stats['CPU.role.destruct'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.destruct'] += 1
+            } else if (creep.memory.role == 'looter') {
+                rolelooter.run(creep);
+                Memory.stats['CPU.role.looter'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.looter'] += 1
+            } else if (creep.memory.role == 'deliver') {
+                roledeliver.run(creep);
+                Memory.stats['CPU.role.deliver'] += Game.cpu.getUsed() - ccpuvor
+                Memory.stats['creeps.role.deliver'] += 1
+            }
+            //CREEPS SUCHEN und in Console ausgeben:
+            // if (creep.memory.boosted == true) {
+            //     console.log('GEFUNDEN: ', creep.name, creep.pos, creep.ticksToLive, creep.memory.renew)
+            // }
         }
-        //CREEPS SUCHEN und in Console ausgeben:
-        // if (creep.memory.boosted == true) {
-        //     console.log('GEFUNDEN: ', creep.name, creep.pos, creep.ticksToLive, creep.memory.renew)
-        // }
-
     }
     //Minerals suchen
     // var srooms = Memory.Empire.rooms
@@ -779,7 +877,13 @@ module.exports.loop = function () {
         })
         rspawns.forEach(rspawn => {
             var rcreeps = rspawn.pos.findInRange(FIND_MY_CREEPS, 1, {
-                filter: cr => cr.memory.boosted != true && cr.ticksToLive < 1450 && cr.memory.role != 'destruct'
+                filter: cr => cr.memory.boosted != true && cr.ticksToLive < 1450 &&
+                    (cr.memory.role == 'carry2'
+                        || cr.memory.role == 'carry'
+                        || cr.memory.role == 'bmstr'
+                        || cr.memory.role == 'upgrader'
+                        || cr.memory.role == 'upgraderstorage'
+                    )
             })
             var rcreep
             if (rcreeps.length > 1) {
@@ -797,7 +901,7 @@ module.exports.loop = function () {
 
     //var monroom = 'W7S19'
     //console.log(monroom + ': RCL' + Game.rooms[monroom].controller.level, Game.rooms[monroom].controller.progress + ' / ' + Game.rooms[monroom].controller.progressTotal + ' --> ' + (Game.rooms[monroom].controller.progressTotal - Game.rooms[monroom].controller.progress) + ' left')
-    
+
     var GCLvor = Memory.GCL
     var GCLnach = Math.ceil(Game.gcl.progress)
     var GCLdif = GCLnach - GCLvor

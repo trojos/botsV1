@@ -1,3 +1,49 @@
+function getfreepos(creep, target) {
+    if (target.pos.y - 1 < 0) { var ltop = 0 } else { var ltop = target.pos.y - 1 }
+    if (target.pos.y + 1 > 49) { var lbottom = 49 } else { var lbottom = target.pos.y + 1 }
+    if (target.pos.x - 1 < 0) { var lleft = 0 } else { var lleft = target.pos.x - 1 }
+    if (target.pos.x + 1 > 49) { var lright = 49 } else { var lright = target.pos.x + 1 }
+    var neartarget = target.room.lookAtArea(ltop, lleft, lbottom, lright, true)
+    //
+    _.remove(neartarget, 'x', 49)
+    _.remove(neartarget, 'x', 0)
+    _.remove(neartarget, 'y', 49)
+    _.remove(neartarget, 'y', 0)
+
+    var neartarget2 = []            //Array kopieren da sonst die remove schleife nicht funktioniert das während der schleife elemente rausgelöscht werden und daher nicht durchläuft
+    for (o in neartarget) {
+        neartarget2.push(neartarget[o])
+    }
+
+    for (j in neartarget) {
+        if (neartarget[j].type == 'creep' || (neartarget[j].type == 'terrain' && neartarget[j].terrain == 'wall') || (neartarget[j].type == 'structure' && neartarget[j].structure.structureType == STRUCTURE_WALL ||neartarget[j].structure.structureType == STRUCTURE_RAMPART)) {
+            var rt = true
+            if (neartarget[j].type == 'creep' && neartarget[j].creep.my) {
+                //console.log(neartarget[j].creep.my)
+                var hcreep = Game.getObjectById(neartarget[j].creep.id)
+                if (hcreep.memory.role == 'FernDD') {
+                    rt = false
+                }
+            }
+            if (rt) {
+                _.remove(neartarget2, function (n) {
+                    return n.y == neartarget[j].y && n.x == neartarget[j].x
+                })
+            }
+        }
+    }
+
+    var freepos = []; var rp
+
+    for (var i in neartarget2) {
+        rp = new RoomPosition(neartarget2[i].x, neartarget2[i].y, creep.room.name)
+        freepos.push(rp)
+        creep.room.visual.circle(rp.x, rp.y, { fill: '#8FBC8F', radius: .5 })
+    }
+
+    return freepos
+}
+
 
 function attackt(creep) {
 
@@ -37,7 +83,7 @@ function attackt(creep) {
         }
 
         for (j in neartarget) {
-            if (neartarget[j].type == 'creep' || (neartarget[j].type == 'terrain' && neartarget[j].terrain == 'wall') || (neartarget[j].type == 'structure' && neartarget[j].structure.structureType == 'constructedWall')) {
+            if (neartarget[j].type == 'creep' || (neartarget[j].type == 'terrain' && neartarget[j].terrain == 'wall') || (neartarget[j].type == 'structure' && (neartarget[j].structure.structureType == STRUCTURE_WALL || neartarget[j].structure.structureType == STRUCTURE_RAMPART))) {
                 var rt = true
                 if (neartarget[j].type == 'creep' && neartarget[j].creep.my) {
                     //console.log(neartarget[j].creep.my)
@@ -59,7 +105,7 @@ function attackt(creep) {
         for (var i in neartarget2) {
             rp = new RoomPosition(neartarget2[i].x, neartarget2[i].y, creep.room.name)
             freepos.push(rp)
-            creep.room.visual.circle(rp.x, rp.y, { fill: '#8FBC8F', radius: .5 })
+            creep.room.visual.circle(rp.x, rp.y, { fill: '#8FBC8F', radius: .5 , opacity: 0.05})
         }
 
         var healtarget = creep.pos.findClosestByRange(freepos)
@@ -68,7 +114,7 @@ function attackt(creep) {
         if (creep.memory._move) {
             var path = Room.deserializePath(creep.memory._move.path);
             if (path.length > 0) {
-                var creeponpath = Game.rooms[creep.pos.roomName].lookForAt(LOOK_CREEPS, path[0].x, path[0].y, )
+                var creeponpath = Game.rooms[creep.pos.roomName].lookForAt(LOOK_CREEPS, path[0].x, path[0].y, { filter: cr => cr.my == true })
                 if (creeponpath.length > 0) {
                     creep.room.visual.circle(path[0].x, path[0].y, { fill: '#ff0000', radius: .5 })
                     if (creeponpath[0].memory.role == 'FernDD' || creeponpath[0].memory.role == 'Dismantler..') {

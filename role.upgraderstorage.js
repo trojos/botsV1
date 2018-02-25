@@ -3,39 +3,12 @@ var creepboost = require('creep.boost')
 
 var roleUpgraderStorage = {
     run: function (creep) {
-        //if (creep.ticksToLive > 1 || creep.ticksToLive == undefined) {
-        //console.log(creep.pos.roomName, creep.name, creep.ticksToLive, creep.memory.boosted)
-        //     //creep.memory.boosted = undefined
-        // }
+        if (creep.ticksToLive == undefined) { return; }
 
-        creepboost.run(creep, creep.memory.home, WORK, 'XGH2O', 15)
+        var boost = [{ BP: WORK, mineral: 'XGH2O', max: 15 }]
+        creepboost.run(creep, creep.memory.home, boost)
 
-        if (creep.memory.boosted == 'goto') { return; }  //Wenn Boost ausgeführt wird, wird abgebrochen bis boost fertig
-        // if ((creep.memory.boosted == true && creep.ticksToLive < 500)) {
-        //     creep.memory.renew = true
-
-        // }
-        // var renew = creep.memory.renew
-        // if (renew) {
-        //     //console.log(creep.name, 'geht zu renew')
-        //     var freespawn = Game.rooms[creep.memory.home].find(FIND_MY_SPAWNS, {
-        //         filter: sp => sp.spawning == null
-        //     })
-        //     if (freespawn.length > 0) {
-        //         var nearfreespawn = creep.pos.findClosestByRange(freespawn)
-        //         if (creep.pos.isNearTo(nearfreespawn)) {
-        //             nearfreespawn.renewCreep(creep)
-        //             console.log('renewed creep', creep.name)
-        //         } else {
-        //             creep.moveTo2(nearfreespawn)
-        //         }
-        //         if (creep.ticksToLive > 1470) {
-        //             creep.memory.upgrading = false;
-        //             creep.memory.renew = false
-        //         }
-        //         return
-        //     }
-        // } 
+        if (creep.memory.boosted == 'goto') { return; }
 
         if (creep.memory.upgrading && creep.carry.energy == 0) {
             creep.memory.upgrading = false;
@@ -54,9 +27,6 @@ var roleUpgraderStorage = {
                     creep.withdraw(link, RESOURCE_ENERGY)
                 }
             }
-            // if (creep.pos.isNearTo(creep.room.storage)) {
-            //     creep.moveTo2(creep.room.controller)
-            // }
         }
         else {
             var dropped = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 3, {

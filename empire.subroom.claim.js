@@ -68,7 +68,7 @@ var subroomclaim = {
         //----------   bmstr  ------------
         //---------- bmstr Baumeister  ----------  //zum Bauen des Spawns  + aufbauhilfe  bis kleiner RCL 4
         if (insight && !wait && claimsuccess) {
-            if (Game.rooms[subroom].controller.level < 4) {
+            if (Game.rooms[subroom].controller.level < 8) {
                 var bmstrsites = Game.rooms[subroom].find(FIND_MY_CONSTRUCTION_SITES)
                 var bmst = 0
                 switch (true) {

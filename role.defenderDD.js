@@ -1,19 +1,3 @@
-function attackeverythinginrangeFDD(creep) {
-    var creepsiR = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3, {       //Wenn außer Reichweite des Hauptzieles wird auf erstbestes Ziel in Reichweite geschossen        
-        filter: sa => sa.owner.username != 'SteveTrov'
-    })
-    if (creepsiR.length > 0) {
-        creep.rangedAttack(creepsiR[0])
-    } else {
-        var struciR = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 3, {       //Wenn außer Reichweite des Hauptzieles wird auf erstbestes Ziel in Reichweite geschossen        
-            filter: sa => sa.owner.username != 'SteveTrov' && sa.structureType != STRUCTURE_POWER_BANK
-        })
-        if (struciR.length > 0) {
-            creep.rangedAttack(struciR[0])
-        }
-    }
-}
-
 function attacktarget(creep, target, hostileroom) {
     if (creep.memory.role == 'NahDD') {
         if (creep.attack(target) == ERR_NOT_IN_RANGE) {
@@ -41,38 +25,22 @@ function attacktarget(creep, target, hostileroom) {
                         creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' } });
                     } else {
                         var path = Room.deserializePath(creep.memory._move.path);
-                        var er = creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' }, ignoreDestructibleStructures: false, ignoreCreeps: true, maxRooms: 1 });
+                        var er = creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' }, ignoreDestructibleStructures: true, ignoreCreeps: true, maxRooms: 1 });
                         //console.log (er)
                         if (path.length > 1) {
-                            var creeponpath = Game.rooms[creep.pos.roomName].lookForAt(LOOK_CREEPS, path[0].x, path[0].y, { filter: cr => cr.my == true })
+                            var creeponpath = Game.rooms[creep.pos.roomName].lookForAt(LOOK_CREEPS, path[0].x, path[0].y, )
                             if (creeponpath.length > 0) {
                                 //console.log(creep.name, 'hinderniss')
                                 creep.room.visual.circle(path[0].x, path[0].y, { fill: '#ff0000', radius: .5 })
-                                if (creeponpath[0].my) {
-                                    if (creeponpath[0].memory.role == 'Heiler' || creeponpath[0].memory.role == 'FernDD' || creeponpath[0].memory.role == 'scout') {
-                                        creeponpath[0].moveTo(creep)
-                                    } else if (creeponpath[0].memory.role == 'NahDD') {
-                                        creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' }, ignoreDestructibleStructures: false, ignoreCreeps: false, maxRooms: 1 });
-                                        //console.log(creeponpath[0].memory.role)
-                                    }
+                                if (creeponpath[0].memory.role == 'Heiler' || creeponpath[0].memory.role == 'FernDD' || creeponpath[0].memory.role == 'scout') {
+                                    creeponpath[0].moveTo(creep)
+                                } else if (creeponpath[0].memory.role == 'NahDD') {
+                                    creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' }, ignoreDestructibleStructures: true, ignoreCreeps: false, maxRooms: 1 });
+                                    console.log(creeponpath[0].memory.role)
                                 }
+
                             }
                         }
-                        // if (path.length && creep.pos.isNearTo(path[0].x, path[0].y)) {
-
-                        //     var targetwall = creep.room.lookForAt(LOOK_STRUCTURES, path[0].x, path[0].y);
-                        //     _.remove(targetwall, 'structureType', 'road')
-                        //     _.remove(targetwall, 'structureType', 'rampart')
-                        //     if (targetwall.length > 0) {
-                        //         var nearstruc = creep.pos.findInRange(FIND_STRUCTURES, 2)
-                        //         //console.log(JSON.stringify(nearstruc))
-                        //         nearstruc.sort((a, b) => a.hits - b.hits);
-                        //         //console.log(JSON.stringify(nearstruc[0]))
-                        //         if (creep.attack(nearstruc[0]) == ERR_NOT_IN_RANGE) {
-                        //             creep.moveTo(nearstruc[0])
-                        //         }
-                        //     }
-                        // }
                     }
                 }
             } else {
@@ -92,27 +60,23 @@ function attacktarget(creep, target, hostileroom) {
                         Memory.Attack[creep.memory.targetroom].Angriffspunkt.pos = target.pos
                     }
                     if (creep.memory._move == undefined) {
-                        creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' }, range: 3 });
+                        creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' } });
                     } else {
                         if (creep.memory._move.path == undefined) {
-                            creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' }, range: 3 });
+                            creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' } });
                         } else {
                             var path = Room.deserializePath(creep.memory._move.path);
-                            var er = creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' }, ignoreDestructibleStructures: false, ignoreCreeps: true, maxRooms: 1, range: 3 });
+                            var er = creep.moveTo(target, { visualizePathStyle: { stroke: '#ff0000' }, ignoreDestructibleStructures: false, ignoreCreeps: true, maxRooms: 1 });
                             //console.log (er)
                             if (path.length > 1) {
-                                var creeponpath = Game.rooms[creep.pos.roomName].lookForAt(LOOK_CREEPS, path[0].x, path[0].y, { filter: cr => cr.my == true })
+                                var creeponpath = Game.rooms[creep.pos.roomName].lookForAt(LOOK_CREEPS, path[0].x, path[0].y, )
                                 if (creeponpath.length > 0) {
                                     //console.log(creep.name, 'hinderniss')
                                     creep.room.visual.circle(path[0].x, path[0].y, { fill: '#ff0000', radius: .5 })
-                                    if (creeponpath) {
-                                        if (creeponpath[0].my) {
-                                            if (creeponpath[0].memory.role == 'Heiler') {
-                                                creeponpath[0].moveTo(creep)
-                                            } else if (creeponpath[0].memory.role == 'FernDD') {
-                                                creeponpath[0].moveTo(target, { range: 2 })
-                                            }
-                                        }
+                                    if (creeponpath[0].memory.role == 'Heiler') {
+                                        creeponpath[0].moveTo(creep)
+                                    } else if (creeponpath[0].memory.role == 'FernDD') {
+                                        creeponpath[0].moveTo(target)
                                     }
                                 }
                             }
@@ -133,33 +97,27 @@ function attacktarget(creep, target, hostileroom) {
                         }
                     }
                 } else {
-                    creep.moveTo2(target, { visualizePathStyle: { stroke: '#ff0000' }, range: 3 });
+                    creep.moveTo2(target, { visualizePathStyle: { stroke: '#ff0000' } });
                 }
             }
 
-            attackeverythinginrangeFDD(creep)
-            // var creepsiR = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3, {       //Wenn außer Reichweite des Hauptzieles wird auf erstbestes Ziel in Reichweite geschossen        
-            //     filter: sa => sa.owner.username != 'SteveTrov'
-            // })
-            // if (creepsiR.length > 0) {
-            //     creep.rangedAttack(creepsiR[0])
-            // } else {
-            //     var struciR = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 3, {       //Wenn außer Reichweite des Hauptzieles wird auf erstbestes Ziel in Reichweite geschossen        
-            //         filter: sa => sa.owner.username != 'SteveTrov' && sa.structureType != STRUCTURE_POWER_BANK
-            //     })
-            //     if (struciR.length > 0) {
-            //         creep.rangedAttack(struciR[0])
-            //     }
-            // }
+            var creepsiR = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3)   //Wenn außer Reichweite des Hauptzieles wird auf erstbestes Ziel in Reichweite geschossen
+            if (creepsiR.length > 0) {
+                creep.rangedAttack(creepsiR[0])
+            } else {
+                var struciR = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 3)
+                if (struciR.length > 0) {
+                    creep.rangedAttack(struciR[0])
+                }
+            }
 
         } else if (rangeto == 3) {
             creep.rangedAttack(target)
-            //creep.rangedMassAttack()
+
             //creep.moveTo2(target)
         } else {
-            creep.say('whot')
             creep.rangedAttack(target)
-            //creep.rangedMassAttack()
+
         }
     }
 }
@@ -178,22 +136,14 @@ function attackt(creep) {
     //Definieren der Ziele nach Priorität
     var at = 0
     if (Game.flags['Attack']) {
-        if (Game.flags['Attack'].pos.roomName == creep.memory.targetroom || Game.flags['Attack'].pos.roomName == creep.room.name) {
-            if (creep.memory.status == 'attack') {
-                //creep.moveTo(Game.flags['Attack'], { visualizePathStyle: { stroke: '#ff0000' } })
-            }
-        }
+        creep.moveTo(Game.flags['Attack'], { visualizePathStyle: { stroke: '#ff0000' } })
     }
-    var target = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 1, {
-        filter: sa => sa.owner.username != 'SteveTrov'
-    })
+    var target = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 1)
     if (target.length > 0) {
         attacktarget(creep, target[0], hostileroom)
         var at = 1
     }
-    var targetac = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-        filter: sa => sa.owner.username != 'SteveTrov'
-    })
+    var targetac = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS)
     if (targetac && at == 0) {
         attacktarget(creep, targetac, hostileroom)
         var at = 4
@@ -219,14 +169,10 @@ var roleNahDD = {
                     at = 1
                 }
             } else {
-                at = attackt(creep)
+               at = attackt(creep) 
             }
         } else {
-            if (creep.memory.status == 'wait') {
-                if (creep.memory.role == 'FernDD') {
-                    attackeverythinginrangeFDD(creep)
-                }
-            }
+            at = attackt(creep)
         }
         if (creep.hits < creep.hitsMax - 1000) {
             var healcreep = creep.pos.findClosestByPath(FIND_MY_CREEPS, {
@@ -237,16 +183,12 @@ var roleNahDD = {
             if (creep.memory.status == 'attack') {
                 if (at == 0 && creep.room.name != creep.memory.targetroom) {
                     //Wenn ein Angriffspunkt definiert wird der Pfad zu diesem gegangen, ansonsten kürzester Weg in den Raum
-                    if (Memory.Attack[creep.memory.targetroom]) {
-                        if (Memory.Attack[creep.memory.targetroom].Angriffspunkt.pos == undefined) {
-                            creep.moveTo2(creep.pos.findClosestByRange(creep.room.findExitTo(targetroom)), { visualizePathStyle: { stroke: '#ff0000' } })
-                        } else {
-                            var enterpos = Memory.Attack[creep.memory.targetroom].Angriffspunkt.pos
-                            const renterpos = new RoomPosition(enterpos.x, enterpos.y, enterpos.roomName)
-                            walk = creep.moveTo2(renterpos, { visualizePathStyle: { stroke: '#ff0000' }, maxRooms: 1 })
-                        }
-                    } else {
+                    if (Memory.Attack[creep.memory.targetroom].Angriffspunkt.pos == undefined) {
                         creep.moveTo2(creep.pos.findClosestByRange(creep.room.findExitTo(targetroom)), { visualizePathStyle: { stroke: '#ff0000' } })
+                    } else {
+                        var enterpos = Memory.Attack[creep.memory.targetroom].Angriffspunkt.pos
+                        const renterpos = new RoomPosition(enterpos.x, enterpos.y, enterpos.roomName)
+                        walk = creep.moveTo2(renterpos, { visualizePathStyle: { stroke: '#ff0000' }, maxRooms: 1 })
                     }
                 }
                 if (at == 0 && creep.room.name == creep.memory.targetroom) { //Wenn keine Angriffsmöglichkeiten im Targetroom geht Creep in die Mitte
@@ -258,12 +200,6 @@ var roleNahDD = {
                     }
 
                 }
-            } else if (creep.memory.status == 'wait') {
-                if (creep.memory.role == 'FernDD') {
-                    attackeverythinginrangeFDD(creep)
-                }
-            } else {
-                at = attackt(creep)
             }
         }
         //Wenn Flagge gesetzt wird dorthingegangen, Flagge wird manuel gesetzt!

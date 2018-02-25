@@ -46,10 +46,10 @@ var roleMinHarv = {
         if (creep.memory.harvesting && _.sum(creep.carry) == creep.carryCapacity) {
             creep.memory.harvesting = false;
         }
-        if (Memory.rooms[targetroom].Wege[creep.memory.spot] == undefined) {
+        if (Memory.rooms[targetroom].spots.spots[creep.memory.spot] == undefined) {
             var weg = 100
         } else {
-            var weg = Memory.rooms[targetroom].Wege[creep.memory.spot].Spawn.cost
+            var weg = Memory.rooms[targetroom].spots.spots[creep.memory.spot].cost
         }
         if (creep.ticksToLive < weg * 2) {               //Wenn Bald tot dann wird ausgeleert und dann destruct damit nix liegenbleibt!
             creep.memory.harvesting = false           //TODO --> Länge minerspot - terminal ermitteln, in memory speichern und tickstolive aufgrund dessen ermitteln
@@ -61,19 +61,33 @@ var roleMinHarv = {
         //---- Harvest
         if (creep.memory.harvesting) {
             if (creep.room.name == targetroom) {
-                var lairatSpawn = targetsource.pos.findInRange(FIND_HOSTILE_STRUCTURES, 5, {
-                    filter: { structureType: STRUCTURE_KEEPER_LAIR }
-                })
-                if (lairatSpawn.length > 0) {
-                    var tts = lairatSpawn[0].ticksToSpawn
-                    if (tts < 7 || tts == undefined) {
-                        avoidlair(creep, 5)
+                // var lairatSpawn = targetsource.pos.findInRange(FIND_HOSTILE_STRUCTURES, 5, {
+                //     filter: { structureType: STRUCTURE_KEEPER_LAIR }
+                // })
+                // if (lairatSpawn.length > 0) {
+                //     var tts = lairatSpawn[0].ticksToSpawn
+                //     if (tts < 7 || tts == undefined) {
+                //         avoidlair(creep, 5)
+                //         var avoidl = true
+                //     } else { var avoidl = false }
+                // } else { avoidl = false }
+
+                var lairatSpawn = Game.getObjectById(Memory.rooms[creep.memory.targetroom].spots.spots[creep.memory.spot].lair)
+
+                if (lairatSpawn) {
+                    var tts = lairatSpawn.ticksToSpawn
+                    var atsource = false
+                    //if (creep.pos.inRangeTo(lairatSpawn, 8)) { atsource = true }
+                    if ((tts < 7 || tts == undefined)) {
+                        var fleepoint = new RoomPosition(Memory.rooms[creep.memory.targetroom].spots.spots[creep.memory.spot].fleepoint.x, Memory.rooms[creep.memory.targetroom].spots.spots[creep.memory.spot].fleepoint.y, Memory.rooms[creep.memory.targetroom].spots.spots[creep.memory.spot].fleepoint.roomName)
+                        creep.moveTo2(fleepoint, { reusePath: 50 }, true)
+                        //avoidlair(creep, 6)
                         var avoidl = true
                     } else { var avoidl = false }
                 } else { avoidl = false }
 
-                if (avoidl) {
-                } else {
+
+                if (!avoidl) {
                     if (creep.harvest(targetsource) == ERR_NOT_IN_RANGE) {
                         creep.moveTo2(targetsource, { reusePath: 25 }), true;
                     }

@@ -39,9 +39,22 @@ var roleBmstr = {
             var lairatSpawn = creep.pos.findInRange(FIND_HOSTILE_STRUCTURES, 5, {
                 filter: { structureType: STRUCTURE_KEEPER_LAIR }
             })
-            if (lairatSpawn.length > 0) { var tts = lairatSpawn[0].ticksToSpawn } else { var tts = 10 }
-            if (tts < 9) {
-                avoidlair(creep, 8)
+            if (lairatSpawn.length > 0) {
+                var tts = lairatSpawn[0].ticksToSpawn
+                var timetotts
+                if (tts < 100) {
+                    var spot = lairatSpawn[0].pos.findInRange(FIND_SOURCES, 5)
+                    if (spot[0] == undefined) {spot = lairatSpawn[0].pos.findInRange(FIND_MINERALS, 5) }
+                    timetotts = Memory.rooms[creep.memory.targetroom].spots.spots[spot[0].id].fleepoint.cost
+                    if (timetotts == undefined) { timetotts = 15 }
+                    if (timetotts > 50) { timetotts = 15 }
+                } else { timetotts = 15}
+            }
+
+            if (tts < timetotts) {
+                var fleepoint = new RoomPosition(Memory.rooms[creep.memory.targetroom].spots.spots[spot[0].id].fleepoint.x, Memory.rooms[creep.memory.targetroom].spots.spots[spot[0].id].fleepoint.y, Memory.rooms[creep.memory.targetroom].spots.spots[spot[0].id].fleepoint.roomName)
+                creep.moveTo2(fleepoint, { reusePath: 50, ignoreCreeps: false }, true)
+                //avoidlair(creep, 8)
             } else {
 
                 if (creep.memory.working && creep.carry.energy == 0) {
@@ -162,7 +175,8 @@ var roleBmstr = {
                                         console.log(JSON.stringify(harvesttarget)) */
 
                     var dropped = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 4, {
-                        filter: dropp => dropp.amount > 60 && dropp.resourceType == RESOURCE_ENERGY
+                        filter: dropp => dropp.amount > 60 && dropp.resourceType == RESOURCE_ENERGY &&
+                            dropp.pos.findInRange(FIND_HOSTILE_CREEPS, 4) == false
                     })
                     if (dropped.length < 1) {
                         var container = creep.pos.findInRange(FIND_STRUCTURES, 10, {
@@ -170,17 +184,18 @@ var roleBmstr = {
                         })
                         if (container.length > 0) {
                             if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo2(container, { reusePath: 25 }, true)
+                                creep.moveTo2(container, { reusePath: 25, maxRooms: 1 }, true)
                             }
                         } else {
                             var dropped = creep.room.find(FIND_DROPPED_RESOURCES, {
-                                filter: dropp => dropp.amount > (creep.carryCapacity * 1.1) && dropp.resourceType == RESOURCE_ENERGY
+                                filter: dropp => dropp.amount > (creep.carryCapacity * 1.1) && dropp.resourceType == RESOURCE_ENERGY &&
+                                    dropp.pos.findInRange(FIND_HOSTILE_CREEPS, 4) == false
                             })
                         }
                     }
                     if (dropped.length > 0) {
                         if (creep.pickup(dropped[0]) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo2(dropped[0], { reusePath: 25 }, true);
+                            creep.moveTo2(dropped[0], { reusePath: 25, maxRooms: 1 }, true);
                         }
                     } else {
                         var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -189,12 +204,12 @@ var roleBmstr = {
                         })
                         if (container) {
                             if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo2(container, { reusePath: 25 }, true)
+                                creep.moveTo2(container, { reusePath: 25 , maxRooms: 1}, true)
                             }
                         } else {
                             var source = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE)
                             if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                                creep.moveTo2(source, { reusePath: 25 }, true)
+                                creep.moveTo2(source, { reusePath: 25, maxRooms: 1 }, true)
                             }
 
                             var miner = creep.pos.findInRange(FIND_MY_CREEPS, 3, {   // Wenn Creep minert wird geprüft ob creep auf container steht
@@ -205,7 +220,7 @@ var roleBmstr = {
                                     filter: stru => stru.structureType == STRUCTURE_CONTAINER
                                 })
                                 if (standon) {
-                                    creep.moveTo2(creep.room.controller.pos, { reusePath: 5 }, true)                // wenn ja, bewegt er sich richtung controller damit platz für miner frei ist
+                                    creep.moveTo2(creep.room.controller.pos, { reusePath: 5, maxRooms: 1 }, true)                // wenn ja, bewegt er sich richtung controller damit platz für miner frei ist
                                 }
                             }
                             if (source == undefined) {
